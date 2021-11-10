@@ -9,7 +9,7 @@ if [ $1 = "ESP32" ]
 		BUILD_DIR=./BIN_ESP32
 		CACHE_DIR=./CACHE_ESP32
 		CORE_URL="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json"
-		FQBN_PARA="esp32:esp32:lolin32:FlashFreq=80,PartitionScheme=default,CPUFreq=240,UploadSpeed=921600"
+		FQBN_PARA="esp32:esp32:lolin32:FlashFreq=80,PartitionScheme=default,CPUFreq=160,UploadSpeed=921600"
 		CORE_NAME=esp32:esp32@${2}
 	else	
 		BUILD_DIR=./BIN_ESP8266

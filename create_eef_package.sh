@@ -53,19 +53,16 @@ if [ -d $EEP_DIR ]
 fi
 mkdir $EEP_DIR
 
-if [ $CHECK_DATA -eq 1 ]; then
-	cp ${BIN_DATA_DIR}/${1}_littlefs.bin ${EEP_DIR}
-fi
-
 if [ $CHECK_ESP8266 -eq 1 ]; then
 	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write_flash\", \"0x0\", \"ESP8266_${1}.ino.bin\""
-	ESPTOOL_PARA_FS=", \"0x200000\" \"${1}_littlefs.bin\""
+	ESPTOOL_PARA_FS=", \"0x200000\", \"ESP8266_${1}_littlefs.bin\""
 
 	ESP8266_EEF_PATH=$EEP_DIR/ESP8266_$1.eef
 	cp ${ESP8266_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP8266_${1}.ino.bin
 	if [ $CHECK_DATA -eq 0 ]; then
 		echo "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}]\n}" > $ESP8266_EEF_PATH
 	else
+		cp ${BIN_DATA_DIR}/ESP8266_${1}_littlefs.bin ${EEP_DIR}
 		echo "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}${ESPTOOL_PARA_FS}]\n}" > $ESP8266_EEF_PATH
 	fi
 fi
@@ -73,7 +70,7 @@ fi
 if [ $CHECK_ESP32 -eq 1 ]; then
 	ESPTOOL_PARA_ESP32="\"command\": [\"--chip\", \"esp32\", \"--baud\", \"921600\", \"--before\", \"default_reset\", \"--after\", \"hard_reset\", \"write_flash\", \"-z\", \"--flash_mode\", \"dio\", \"--flash_freq\", \"80m\", \"--flash_size\", \"detect\""
 	ESPTOOL_PARA_ESP32_FILES=", \"0xe000\", \"boot_app0.bin\", \"0x1000\", \"ESP32_${1}.ino.bootloader.bin\", \"0x10000\", \"ESP32_${1}.ino.bin\", \"0x8000\", \"ESP32_${1}.ino.partitions.bin\""
-	ESPTOOL_PARA_ESP32_FS=", \"0x210000\", \"${1}_littlefs.bin\""
+	ESPTOOL_PARA_ESP32_FS=", \"0x210000\", \"ESP32_${1}_littlefs.bin\""
 	ESP32_EEF_PATH=$EEP_DIR/ESP32_$1.eef
 	
 	cp ~/.arduino15/packages/esp32/hardware/esp32/${2}/tools/partitions/boot_app0.bin ${EEP_DIR}
@@ -84,6 +81,7 @@ if [ $CHECK_ESP32 -eq 1 ]; then
 		echo "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}]\n}" > $ESP32_EEF_PATH
 	else
 		echo "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}${ESPTOOL_PARA_ESP32_FS}]\n}" > $ESP32_EEF_PATH
+		cp ${BIN_DATA_DIR}/ESP32_${1}_littlefs.bin ${EEP_DIR}
 	fi
 fi
 
