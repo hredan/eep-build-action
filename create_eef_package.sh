@@ -59,7 +59,7 @@ fi
 
 if [ $CHECK_ESP8266 -eq 1 ]; then
 	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write_flash\", \"0x0\", \"ESP8266_${1}.ino.bin\""
-	ESPTOOL_PARA_FS=", \"0x200000\" \"${1}_littlefs.bin\""
+	ESPTOOL_PARA_FS=", \"0x200000\", \"${1}_littlefs.bin\""
 
 	ESP8266_EEF_PATH=$EEP_DIR/ESP8266_$1.eef
 	cp ${ESP8266_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP8266_${1}.ino.bin

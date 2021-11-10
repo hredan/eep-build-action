@@ -19,4 +19,5 @@ if [ ! -f "$TOOL" ]
 		cd ..
 fi
 mkdir ./BIN_DATA
-$TOOL -c ./data -p 256 -b 8192 -s 2072576 ./BIN_DATA/$1_littlefs.bin
+$TOOL -c ./data -p 256 -b 8192 -s 2072576 ./BIN_DATA/ESP8266_$1_littlefs.bin
+$TOOL -c ./data -p 256 -b 4096 -s 1507328 ./BIN_DATA/ESP32_$1_littlefs.bin
