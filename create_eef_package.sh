@@ -78,7 +78,7 @@ if [ $CHECK_ESP32 -eq 1 ]; then
 	
 	cp ~/.arduino15/packages/esp32/hardware/esp32/${2}/tools/partitions/boot_app0.bin ${EEP_DIR}
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bin
-	cp ${ESP32_BUILD_DIR}/${1}.bootloader.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bootloader.bin
+	cp ${ESP32_BUILD_DIR}/${1}.ino.bootloader.bin ${EEP_DIR}/ESP32_${1}.ino.bootloader.bin
 	cp ${ESP32_BUILD_DIR}/${1}.ino.partitions.bin ${EEP_DIR}/ESP32_${1}.ino.partitions.bin
 	if [ $CHECK_DATA -eq 0 ]; then
 		echo "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}]\n}" > $ESP32_EEF_PATH
