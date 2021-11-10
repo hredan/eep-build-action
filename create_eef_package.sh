@@ -1,9 +1,9 @@
 #!/bin/bash
-ESP8266_BUILD_DIR="./BIN_ESP8266"
-ESP32_BUILD_DIR="./BIN_ESP32"
-BIN_DATA_DIR="./BIN_DATA"
+ESP8266_BUILD_DIR=./BIN_ESP8266
+ESP32_BUILD_DIR=./BIN_ESP32
+BIN_DATA_DIR=./BIN_DATA
 
-EEP_DIR="./EEP"
+EEP_DIR=./EEP
 
 CHECK_ESP8266=0
 CHECK_ESP32=0
@@ -67,7 +67,7 @@ if [ $CHECK_ESP32 -eq 1 ]; then
 	ESPTOOL_PARA_ESP32_FS=", \"0x210000\", \"${1}_littlefs.bin\""
 	ESP32_EEF_PATH=$EEP_DIR/ESP32_$1.eef
 	
-	cp ~/.arduino15/packages/esp32/hardware/esp32/2.0.1-RC1/tools/partitions/boot_app0.bin ${EEP_DIR}
+	cp ~/.arduino15/packages/esp32/hardware/esp32/2.0.1/tools/partitions/boot_app0.bin ${EEP_DIR}
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bin
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bootloader.bin
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.partitions.bin
