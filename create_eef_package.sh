@@ -1,4 +1,5 @@
 #!/bin/bash
+ARTIFACT_DIR="./Artifacts"
 ESP8266_BUILD_DIR=./BIN_ESP8266
 ESP32_BUILD_DIR=./BIN_ESP32
 BIN_DATA_DIR=./BIN_DATA
@@ -9,6 +10,10 @@ CHECK_ESP8266=0
 CHECK_ESP32=0
 CHECK_DATA=0
 
+if [ ! -d $ARTIFACT_DIR ]
+	then
+		mkdir $ARTIFACT_DIR
+fi
 
 if [ -d $ESP8266_BUILD_DIR ]
 	then
@@ -82,7 +87,7 @@ if [ -d $EEP_DIR ]
 	then
 		echo "create eef package"
 		cd $EEP_DIR
-		zip -r ../Artifacts/$1.eep .
+		zip -r .$ARTIFACT_DIR/$1.eep .
 		cd ..
 fi
 
