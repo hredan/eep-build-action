@@ -1,4 +1,8 @@
 #!/bin/bash
+#$1 defines the name of the sketch
+#$2 defines the ESP32 core version, e.g. 2.0.1
+#
+#example call: sh .ESP_Action_Build_Scripts/create_eef_package.sh ESP_jQuery_Mobile_Interface 2.0.1
 ARTIFACT_DIR="./Artifacts"
 ESP8266_BUILD_DIR=./BIN_ESP8266
 ESP32_BUILD_DIR=./BIN_ESP32
@@ -72,7 +76,7 @@ if [ $CHECK_ESP32 -eq 1 ]; then
 	ESPTOOL_PARA_ESP32_FS=", \"0x210000\", \"${1}_littlefs.bin\""
 	ESP32_EEF_PATH=$EEP_DIR/ESP32_$1.eef
 	
-	cp ~/.arduino15/packages/esp32/hardware/esp32/2.0.1/tools/partitions/boot_app0.bin ${EEP_DIR}
+	cp ~/.arduino15/packages/esp32/hardware/esp32/${2}/tools/partitions/boot_app0.bin ${EEP_DIR}
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bin
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.bootloader.bin
 	cp ${ESP32_BUILD_DIR}/${1}.ino.bin ${EEP_DIR}/ESP32_${1}.ino.partitions.bin
