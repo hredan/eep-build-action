@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
 ARDUINO_CLI_VERSION="0.19.3"
@@ -20,7 +20,7 @@ HELP="Paramter:\n
 -v\tcore version\n
 e.g. sh ./build_sketch.sh -s SKETCH_NAME\n"
 
-while getopts c:b:f:s:v:h: flag
+while getopts c:b:f:s:v:h flag
 do
     case "${flag}" in
         c) CORE=${OPTARG};;
@@ -28,7 +28,7 @@ do
         f) CPUF=${OPTARG};;
 		s) SKETCH_NAME=${OPTARG};;
 		v) CORE_VERSION=${OPTARG};;
-		h) echo $HELP;;
+		h) echo $HELP; exit 0;
     esac
 done
 
