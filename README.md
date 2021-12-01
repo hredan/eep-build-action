@@ -20,3 +20,16 @@ Paramter:
  -v     core version (default last one)
  e.g. sh ./build_sketch.sh -s SKETCH_NAME
 ```
+# Example
+How the scripts are working in the GitHub Actions you can have a look to the following Projects:
+## ESP_Blink
+[ESP_Blink Workflows](https://github.com/hredan/ESP_Blink/tree/master/.github/workflows)
+
+[ESP_Blink Actions](https://github.com/hredan/ESP_Blink/actions)
+## ESP_jQuery_Mobile_Interface Workflows
+[ESP_jQuery_Mobile_Interface Workflows](https://github.com/hredan/ESP_jQuery_Mobile_Interface/tree/main/.github/workflows)
+
+[ESP_jQuery_Mobile_Interface Actions](https://github.com/hredan/ESP_jQuery_Mobile_Interface/actions)
+
+# Disclaimer
+All this code is released under the GPL, and all of it is to be used at your own risk. If you find any bugs, please let me know via the GitHub issue tracker or drop me an email ([hredan@sleepuino.info](mailto:hredan@sleepuino.info)).
