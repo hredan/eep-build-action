@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
 ARDUINO_CLI_VERSION="0.22.0"
@@ -11,20 +11,23 @@ BIN_DATA_DIR=./BIN_DATA
 CORE=esp8266
 BOARD=d1_mini
 CPUF=160
+LIBS=""
 
 HELP="Paramter:\n
--c\tCORE=esp8266/esp32\n
+-c\tCORE esp8266/esp32\n
 -b\tBOARD e.g. d1_mini or d1_mini32\n
+-l\tLIBS comma seperated Lib names e.g. U8g2,RTClib\n
 -f\tCPU Frequence e.g. 80, 160 or 240\n
 -s\tSketch name (mandatory)!\n
 -v\tcore version\n
 e.g. sh ./build_sketch.sh -s SKETCH_NAME\n"
 
-while getopts c:b:f:s:v:h flag
+while getopts c:b:f:l:s:v:h flag
 do
     case "${flag}" in
         c) CORE=${OPTARG};;
         b) BOARD=${OPTARG};;
+		l) LIBS=${OPTARG};;
         f) CPUF=${OPTARG};;
 		s) SKETCH_NAME=${OPTARG};;
 		v) CORE_VERSION=${OPTARG};;
@@ -42,6 +45,7 @@ if  [ -z ${SKETCH_NAME} ]
 		echo "Sketch: $SKETCH_NAME"
 		echo "Core:\t$CORE"
 		echo "Board:\t$BOARD"
+		echo "LIBS:\t$LIBS"
 		echo "CPU F:\t$CPUF"
 		echo "Version:\t$CORE_VERSION"
 fi
@@ -77,7 +81,7 @@ fi
 
 if [ ! -f "$TOOL" ]
 	then
-		echo "## download and unpack mklittlefs ##"
+		echo "## download and unpack ARDUINO_CLI ##"
 		cd "$TOOL_DIR"
 		wget "$TOOL_URL"
 		tar -xf ./arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz
@@ -95,6 +99,14 @@ if [ "$?" -ne "0" ]; then
 	echo "Core installation failed with errorcode $?"
 	exit 1
 fi
+
+echo "## install needed libs ##"
+IFS="," read -a lib_arr <<< $LIBS
+for lib in ${lib_arr[@]}
+do
+	echo "Install Lib: $lib"
+	$TOOL lib install $lib
+done
 
 echo "## Start compiling ##"
 $TOOL compile --fqbn $FQBN_PARA --build-path $BUILD_DIR --build-cache-path $CACHE_DIR $SKETCH_NAME.ino
@@ -118,7 +130,10 @@ if [ -d $BIN_DATA_DIR ]
 fi
 
 CORE_TEXT=$($TOOL core search $CORE)
-echo "### Core Version ###\n$CORE_TEXT"
+echo -e "### Core Version ###\n$CORE_TEXT"
+
+LIBS_TEXT=$($TOOL lib list)
+echo -e "### LIB Versions ###\n$LIBS_TEXT"
 
 OUPUT_NAME=${BOARD}_${SKETCH_NAME}
 if [ $CORE = "esp8266" ]; then
