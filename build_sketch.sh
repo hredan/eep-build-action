@@ -1,7 +1,7 @@
 #!/bin/sh
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
-ARDUINO_CLI_VERSION="0.19.3"
+ARDUINO_CLI_VERSION="0.22.0"
 TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
 TOOL=./tools/arduino-cli
 
