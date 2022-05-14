@@ -2,8 +2,6 @@
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
 ARDUINO_CLI_VERSION="0.22.0"
-TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
-TOOL=./tools/arduino-cli
 
 BIN_DATA_DIR=./BIN_DATA
 
@@ -31,27 +29,66 @@ do
         f) CPUF=${OPTARG};;
 		s) SKETCH_NAME=${OPTARG};;
 		v) CORE_VERSION=${OPTARG};;
-		h) echo $HELP; exit 0;
+		h) echo -e $HELP; exit 0;
     esac
 done
 
-if  [ -z ${SKETCH_NAME} ]
+# set TOOL_URL and TOOL PATH (depends on OS)
+#check tool dir#
+if [ ! -d "$TOOL_DIR" ]
+	then
+		echo "## create $TOOL_DIR ##"
+		mkdir $TOOL_DIR
+fi
+
+if [ ! -f "$TOOL" ]; then
+	echo "## download and unpack ARDUINO_CLI ##"
+	cd "$TOOL_DIR"
+
+	case $OSTYPE in
+		linux-gnu)
+			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL=./tools/arduino-cli
+			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
+			tar -xf ./$TOOL_ACHIVE_NAME
+			;;
+		msys)
+			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Windows_64bit.zip"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL=./tools/arduino-cli.exe
+			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
+			unzip -o $TOOL_ACHIVE_NAME
+			;;
+		*)
+			echo "OS: $OSTYPE currently not supported!"
+			exit 1
+			;;
+	esac
+	cd ..
+fi
+# get summary
+if [ -z ${SKETCH_NAME} ]
 	then
 		echo "ERROR: Sketch name not defined"
-		echo $HELP
+		echo -e $HELP
 		exit 1
 	else
 		echo "### Build starts with parameter: ###"
 		echo "Sketch: $SKETCH_NAME"
-		echo "Core:\t$CORE"
-		echo "Board:\t$BOARD"
-		echo "LIBS:\t$LIBS"
-		echo "CPU F:\t$CPUF"
-		echo "Version:\t$CORE_VERSION"
+		echo -e "Core:\t$CORE"
+		echo -e "Board:\t$BOARD"
+		echo -e "LIBS:\t$LIBS"
+		echo -e "CPU F:\t$CPUF"
+		echo -e "Version:\t$CORE_VERSION"
 fi
 
 # create littlefs binaries if data is available
 sh $SCRIPT_DIR/build_data.sh -c $CORE -s $SKETCH_NAME
+if [ "$?" -ne "0" ]; then
+	echo "Creation of littlefs failed"
+	exit 1
+fi
 
 if [ $CORE = "esp32" ]
 	then
@@ -71,22 +108,6 @@ fi
 if [ -d $BUILD_DIR ]; then
 	rm rm -r -f $BUILD_DIR
 fi	
-
-#check tool dir#
-if [ ! -d "$TOOL_DIR" ]
-	then
-		echo "## create $TOOL_DIR ##"
-		mkdir $TOOL_DIR
-fi
-
-if [ ! -f "$TOOL" ]
-	then
-		echo "## download and unpack ARDUINO_CLI ##"
-		cd "$TOOL_DIR"
-		wget "$TOOL_URL"
-		tar -xf ./arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz
-		cd ..
-fi
 
 echo "## Create output directories ##"
 mkdir $BUILD_DIR
