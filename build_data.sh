@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 TOOL_DIR="./tools"
 MKLITTLEFS_VERSION="3.0.0"
 TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"

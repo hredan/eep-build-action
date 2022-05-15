@@ -84,7 +84,7 @@ if [ -z ${SKETCH_NAME} ]
 fi
 
 # create littlefs binaries if data is available
-sh $SCRIPT_DIR/build_data.sh -c $CORE -s $SKETCH_NAME
+bash $SCRIPT_DIR/build_data.sh -c $CORE -s $SKETCH_NAME
 if [ "$?" -ne "0" ]; then
 	echo "Creation of littlefs failed"
 	exit 1
