@@ -205,4 +205,8 @@ if [ $CORE = "esp32" ]; then
 	fi
 fi
 
-
+# write readme.txt
+README_PATH="$EEP_DIR/readme.txt"
+if [ ! -f $README_PATH ]; then
+	echo "This package can be used with ESPEasyFlasher2.0 (https://github.com/hredan/ESPEASYFLASHER_2.0)" > $README_PATH
+fi
