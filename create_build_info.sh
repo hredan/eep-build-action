@@ -16,10 +16,12 @@ done
 
 case $OSTYPE in
     linux-gnu)
-        TOOL=./tools/arduino-cli
+        CLI=./tools/arduino-cli
+        MKL=./tools/mklittlefs/mklittlefs
         ;;
     msys)
-        TOOL=./tools/arduino-cli.exe
+        CLI=./tools/arduino-cli.exe
+        MKL=./tools/mklittlefs/mklittlefs.exe 
         ;;
     *)
         echo "OS: $OSTYPE currently not supported!"
@@ -34,11 +36,21 @@ if [ -d $EEP_DIR ]; then
     echo -e "Repository URL: www.github.com/$REPO_NAME" > $INFO_FILE_PATH
     echo -e "GITHUB_SHA:     $SHA" >> $INFO_FILE_PATH
     
-    if [ -f $TOOL ]; then
-        CORE_TEXT=$($TOOL core list)
+    if [ -f $MKL ]; then
+        MKL_VERSION=$($MKL --version)
+    fi
+
+    if [ -f $CLI ]; then
+        echo -e "\n### Tools ###" >> $INFO_FILE_PATH
+        echo $($CLI version) >> $INFO_FILE_PATH
+        if [ ! -z ${MKL_VERSION+x} ]; then
+            echo "$MKL_VERSION" >> $INFO_FILE_PATH
+        fi
+
+        CORE_TEXT=$($CLI core list)
         echo -e "\n### Core Versions ###\n$CORE_TEXT" >> $INFO_FILE_PATH
 
-        LIBS_TEXT=$($TOOL lib list)
+        LIBS_TEXT=$($CLI lib list)
         echo -e "\n### LIB Versions ###\n$LIBS_TEXT" >> $INFO_FILE_PATH
     fi
 else
