@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 TOOL_DIR="./tools"
 MKLITTLEFS_VERSION="3.0.0"
 TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"
@@ -15,20 +15,19 @@ do
     case "${flag}" in
         c) CORE=${OPTARG};;      
 		s) SKETCH_NAME=${OPTARG};;		
-		h) echo $HELP;;
+		h) echo -e $HELP;;
     esac
 done
 
-
-if  [ -z ${SKETCH_NAME} &&  -z ${CORE}]
+if [ -z ${SKETCH_NAME} ] || [ -z ${CORE} ]
 	then
 		echo "ERROR: Sketch name or Core are not defined"
-		echo $HELP
+		echo -e $HELP
 		exit 1
 	else
 		echo "### Build data starts with parameter: ###"
-		echo "Sketch: $SKETCH_NAME"
-		echo "Core:\t$CORE"		
+		echo -e "Sketch:\t$SKETCH_NAME"
+		echo -e "Core:\t$CORE"
 fi
 
 if [ -d "$DATA_DIR" ]; then
@@ -39,13 +38,30 @@ if [ -d "$DATA_DIR" ]; then
 			mkdir $TOOL_DIR
 	fi
 
-
-	if [ ! -f "$TOOL" ]
-		then
+	if [ ! -f "$TOOL" ]; then
 			echo "download and unpack mklittlefs"
 			cd "$TOOL_DIR"
-			wget "$TOOL_URL"
-			tar -xf ./x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz
+
+			case $OSTYPE in
+				linux-gnu)
+					ARCHIVE_NAME="x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"
+					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
+					TOOL=./tools/mklittlefs/mklittlefs
+					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
+					tar -xf ./$ARCHIVE_NAME
+					;;
+				msys)
+					ARCHIVE_NAME="x86_64-w64-mingw32-mklittlefs-295fe9b.zip"
+					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
+					TOOL=./tools/mklittlefs/mklittlefs
+					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
+					unzip ./$ARCHIVE_NAME
+					;;
+				*)
+					echo "OS: $OSTYPE currently not supported!"
+					exit 1
+					;;
+			esac
 			cd ..
 	fi
 	mkdir ./BIN_DATA

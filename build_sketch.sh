@@ -1,9 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
-ARDUINO_CLI_VERSION="0.19.3"
-TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
-TOOL=./tools/arduino-cli
+ARDUINO_CLI_VERSION="0.22.0"
 
 BIN_DATA_DIR=./BIN_DATA
 
@@ -11,43 +9,86 @@ BIN_DATA_DIR=./BIN_DATA
 CORE=esp8266
 BOARD=d1_mini
 CPUF=160
+LIBS=""
 
 HELP="Paramter:\n
--c\tCORE=esp8266/esp32\n
+-c\tCORE esp8266/esp32\n
 -b\tBOARD e.g. d1_mini or d1_mini32\n
+-l\tLIBS comma seperated Lib names e.g. U8g2,RTClib\n
 -f\tCPU Frequence e.g. 80, 160 or 240\n
 -s\tSketch name (mandatory)!\n
 -v\tcore version\n
 e.g. sh ./build_sketch.sh -s SKETCH_NAME\n"
 
-while getopts c:b:f:s:v:h flag
+while getopts c:b:f:l:s:v:h flag
 do
     case "${flag}" in
         c) CORE=${OPTARG};;
         b) BOARD=${OPTARG};;
+		l) LIBS=${OPTARG};;
         f) CPUF=${OPTARG};;
 		s) SKETCH_NAME=${OPTARG};;
 		v) CORE_VERSION=${OPTARG};;
-		h) echo $HELP; exit 0;
+		h) echo -e $HELP; exit 0;
     esac
 done
 
-if  [ -z ${SKETCH_NAME} ]
+# set TOOL_URL and TOOL PATH (depends on OS)
+#check tool dir#
+if [ ! -d "$TOOL_DIR" ]
+	then
+		echo "## create $TOOL_DIR ##"
+		mkdir $TOOL_DIR
+fi
+
+if [ ! -f "$TOOL" ]; then
+	echo "## download and unpack ARDUINO_CLI ##"
+	cd "$TOOL_DIR"
+
+	case $OSTYPE in
+		linux-gnu)
+			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL=./tools/arduino-cli
+			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
+			tar -xf ./$TOOL_ACHIVE_NAME
+			;;
+		msys)
+			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Windows_64bit.zip"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL=./tools/arduino-cli.exe
+			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
+			unzip -o $TOOL_ACHIVE_NAME
+			;;
+		*)
+			echo "OS: $OSTYPE currently not supported!"
+			exit 1
+			;;
+	esac
+	cd ..
+fi
+# get summary
+if [ -z ${SKETCH_NAME} ]
 	then
 		echo "ERROR: Sketch name not defined"
-		echo $HELP
+		echo -e $HELP
 		exit 1
 	else
 		echo "### Build starts with parameter: ###"
 		echo "Sketch: $SKETCH_NAME"
-		echo "Core:\t$CORE"
-		echo "Board:\t$BOARD"
-		echo "CPU F:\t$CPUF"
-		echo "Version:\t$CORE_VERSION"
+		echo -e "Core:\t$CORE"
+		echo -e "Board:\t$BOARD"
+		echo -e "LIBS:\t$LIBS"
+		echo -e "CPU F:\t$CPUF"
+		echo -e "Version:\t$CORE_VERSION"
 fi
 
 # create littlefs binaries if data is available
-sh $SCRIPT_DIR/build_data.sh -c $CORE -s $SKETCH_NAME
+bash $SCRIPT_DIR/build_data.sh -c $CORE -s $SKETCH_NAME
+if [ "$?" -ne "0" ]; then
+	echo "Creation of littlefs failed"
+	exit 1
+fi
 
 if [ $CORE = "esp32" ]
 	then
@@ -68,22 +109,6 @@ if [ -d $BUILD_DIR ]; then
 	rm rm -r -f $BUILD_DIR
 fi	
 
-#check tool dir#
-if [ ! -d "$TOOL_DIR" ]
-	then
-		echo "## create $TOOL_DIR ##"
-		mkdir $TOOL_DIR
-fi
-
-if [ ! -f "$TOOL" ]
-	then
-		echo "## download and unpack mklittlefs ##"
-		cd "$TOOL_DIR"
-		wget "$TOOL_URL"
-		tar -xf ./arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz
-		cd ..
-fi
-
 echo "## Create output directories ##"
 mkdir $BUILD_DIR
 mkdir $CACHE_DIR
@@ -95,6 +120,14 @@ if [ "$?" -ne "0" ]; then
 	echo "Core installation failed with errorcode $?"
 	exit 1
 fi
+
+echo "## install needed libs ##"
+IFS="," read -a lib_arr <<< $LIBS
+for lib in ${lib_arr[@]}
+do
+	echo "Install Lib: $lib"
+	$TOOL lib install $lib
+done
 
 echo "## Start compiling ##"
 $TOOL compile --fqbn $FQBN_PARA --build-path $BUILD_DIR --build-cache-path $CACHE_DIR $SKETCH_NAME.ino
@@ -118,7 +151,10 @@ if [ -d $BIN_DATA_DIR ]
 fi
 
 CORE_TEXT=$($TOOL core search $CORE)
-echo "### Core Version ###\n$CORE_TEXT"
+echo -e "### Core Version ###\n$CORE_TEXT"
+
+LIBS_TEXT=$($TOOL lib list)
+echo -e "### LIB Versions ###\n$LIBS_TEXT"
 
 OUPUT_NAME=${BOARD}_${SKETCH_NAME}
 if [ $CORE = "esp8266" ]; then
@@ -169,4 +205,8 @@ if [ $CORE = "esp32" ]; then
 	fi
 fi
 
-
+# write readme.txt
+README_PATH="$EEP_DIR/readme.txt"
+if [ ! -f $README_PATH ]; then
+	echo "This package can be used with ESPEasyFlasher2.0 (https://github.com/hredan/ESPEASYFLASHER_2.0)" > $README_PATH
+fi
