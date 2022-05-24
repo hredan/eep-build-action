@@ -165,10 +165,10 @@ if [ $CORE = "esp8266" ]; then
 	ESP8266_EEF_PATH=$EEP_DIR/ESP8266_${BOARD}_${SKETCH_NAME}.eef
 	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bin ${EEP_DIR}/ESP8266_${OUPUT_NAME}.ino.bin
 	if [ $CHECK_DATA -eq 0 ]; then
-		echo "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}]\n}" > $ESP8266_EEF_PATH
+		echo -e "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}]\n}" > $ESP8266_EEF_PATH
 	else
 		cp ${BIN_DATA_DIR}/ESP8266_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
-		echo "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}${ESPTOOL_PARA_FS}]\n}" > $ESP8266_EEF_PATH
+		echo -e "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}${ESPTOOL_PARA_FS}]\n}" > $ESP8266_EEF_PATH
 	fi
 fi
 
@@ -198,9 +198,9 @@ if [ $CORE = "esp32" ]; then
 	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bootloader.bin ${EEP_DIR}/ESP32_${OUPUT_NAME}.ino.bootloader.bin
 	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.partitions.bin ${EEP_DIR}/ESP32_${OUPUT_NAME}.ino.partitions.bin
 	if [ $CHECK_DATA -eq 0 ]; then
-		echo "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}]\n}" > $ESP32_EEF_PATH
+		echo -e "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}]\n}" > $ESP32_EEF_PATH
 	else
-		echo "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}${ESPTOOL_PARA_ESP32_FS}]\n}" > $ESP32_EEF_PATH
+		echo -e "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}${ESPTOOL_PARA_ESP32_FS}]\n}" > $ESP32_EEF_PATH
 		cp ${BIN_DATA_DIR}/ESP32_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
 	fi
 fi
