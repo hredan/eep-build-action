@@ -6,7 +6,7 @@ For example have a look to [ESP_jQuery_Mobile_Interface Actions](https://github.
 # Add Scripts to your repository
 If you want use the scripts, you can add it easily as submodule
 ```bash
-git submodule add https://github.com/hredan/ESP_Action_Build_Scripts.git
+git submodule add https://github.com/hredan/ESP_Build_Scripts.git
 ```
 # Script desciption
 ## build_sketch.sh
