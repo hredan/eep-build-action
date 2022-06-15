@@ -3,13 +3,15 @@ TOOL_DIR="./tools"
 HELP="Paramter:\n
 -s\tGITHUB_SHA\n
 -r\tGITHUB_REPOSITORY\n
+-t\tTAG_NAME\n
 e.g. sh ./create_build_info.sh -s \$GITHUB_SHA -r \$GITHUB_REPOSITORY\n"
 
-while getopts s:r:h flag
+while getopts s:r:h:t flag
 do
     case "${flag}" in
         s) SHA=${OPTARG};;
-        r) REPO_NAME=${OPTARG};;		
+        r) REPO_NAME=${OPTARG};;
+        t) TAG_NAME=${OPTARG};;
         h) echo -e $HELP; exit 0;
     esac
 done
@@ -33,9 +35,13 @@ esac
 EEP_DIR=./EEP
 INFO_FILE_PATH=$EEP_DIR/build_info.txt
 if [ -d $EEP_DIR ]; then
-    echo -e "Repository URL: www.github.com/$REPO_NAME" > $INFO_FILE_PATH
-    echo -e "GITHUB_SHA:     $SHA" >> $INFO_FILE_PATH
-    
+    echo -e "Repository URL:  www.github.com/$REPO_NAME" > $INFO_FILE_PATH
+    echo -e "GITHUB_SHA:      $SHA" >> $INFO_FILE_PATH
+    if [ ! -z ${TAG_NAME} ]; then
+        echo -e "Release version: ${TAG_NAME}" >> $INFO_FILE_PATH
+    fi
+
+
     if [ -f $MKL ]; then
         MKL_VERSION=$($MKL --version)
     fi
