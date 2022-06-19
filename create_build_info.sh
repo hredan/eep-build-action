@@ -6,7 +6,7 @@ HELP="Paramter:\n
 -t\tTAG_NAME\n
 e.g. sh ./create_build_info.sh -s \$GITHUB_SHA -r \$GITHUB_REPOSITORY\n"
 
-while getopts s:r:h:t flag
+while getopts s:r:t:h flag
 do
     case "${flag}" in
         s) SHA=${OPTARG};;
