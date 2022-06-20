@@ -142,7 +142,7 @@ if [ ! -d $EEP_DIR ]; then
 	mkdir $EEP_DIR
 else
 	# cleanup EEP directory before copy files to creating eef package (eep)
-	rm -r ${EEP_DIR}
+	rm -r ${EEP_DIR}/*
 fi
 
 # check are data available
