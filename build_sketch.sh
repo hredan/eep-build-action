@@ -1,7 +1,7 @@
 #!/bin/bash
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
-ARDUINO_CLI_VERSION="0.22.0"
+ARDUINO_CLI_VERSION="0.23.0"
 
 BIN_DATA_DIR=./BIN_DATA
 
@@ -140,6 +140,9 @@ fi
 EEP_DIR=./EEP
 if [ ! -d $EEP_DIR ]; then
 	mkdir $EEP_DIR
+else
+	# cleanup EEP directory before copy files to creating eef package (eep)
+	rm -r ${EEP_DIR}/*
 fi
 
 # check are data available
