@@ -1,0 +1,12 @@
+name: 'esp-build-action'
+description: 'Builds an eep file, this can be used with the ESPEASYFLASHER_2.0'
+inputs:
+  sketch-name: # name of main ino file
+    description: 'Name of the main ino file'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Run build_sketch.sh
+      run: build_sketch.sh -s ${{ inputs.sketch-name }}
+      shell: bash
