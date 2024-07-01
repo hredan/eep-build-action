@@ -18,7 +18,7 @@ do
     esac
 done
 
-if [ -z ${SKETCH_NAME} ] || [ -z ${CORE} || [ -z ${BOARD} ]
+if [ -z ${SKETCH_NAME} ] || [ -z ${CORE} ] || [ -z ${BOARD} ]
 	then
 		echo "ERROR: Sketch name ,Core or Board not defined"
 		echo -e $HELP
