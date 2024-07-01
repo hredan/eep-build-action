@@ -26,8 +26,7 @@ if [ -z ${SKETCH_NAME} ] || [ -z ${CORE} || [ -z ${BOARD} ]
 	else
 		echo "### create eef package (eep): ###"
 fi
-
-EEP_DIR=${SCRIPT_DIR}/../EEP
+EEP_DIR=./EEP
 # create zip file (eef package)
 if [ -d ${EEP_DIR} ]; then
      zip -j ${CORE}_${BOARD}_${SKETCH_NAME}.eep ${EEP_DIR}/*
