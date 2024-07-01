@@ -4,6 +4,14 @@ inputs:
   sketch-name: # name of main ino file
     description: 'Name of the main ino file'
     required: true
+  core: # core esp8266 or esp32
+    description: 'Core to use'
+    required: true
+    default: 'esp8266'
+  board: # board to use
+    description: 'Board to use'
+    required: true
+    default: 'd1_mini'
 runs:
   using: 'composite'
   steps:
@@ -13,5 +21,12 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run build_sketch.sh
-      run: build_sketch.sh -s ${{ inputs.sketch-name }}
+      run: build_sketch.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
       shell: bash
+    - name: Create build info
+      run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY
+      shell: bash
+    - name: Create eep package
+      run: create_eep_package.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
+      shell: bash
+    
