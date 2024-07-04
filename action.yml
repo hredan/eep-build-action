@@ -33,7 +33,7 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run build_sketch.sh
-      run: build_sketch.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }} -f ${{ inputs.cpu-frequency }} -v ${{ inputs.core-version }} -l ${{ inputs.libs }}
+      run: start_action_with_param.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }} -f ${{ inputs.cpu-frequency }} -v ${{ inputs.core-version }} -l ${{ inputs.libs }}
       shell: bash
     - name: Create build info
       run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY
