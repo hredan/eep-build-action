@@ -62,4 +62,5 @@ if [ -d $EEP_DIR ]; then
 else
     echo "Error: could not create build_info.txt"
     echo "Error: $EEP_DIR does not exsist!"
+    exit 1
 fi

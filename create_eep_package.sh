@@ -32,4 +32,5 @@ if [ -d ${EEP_DIR} ]; then
      zip -j ${CORE}_${BOARD}_${SKETCH_NAME}.eep ${EEP_DIR}/*
 else
     echo "Error could not find directory "
+	exit 1
 fi
