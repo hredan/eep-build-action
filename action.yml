@@ -36,9 +36,9 @@ runs:
       run: start_action.sh
       shell: bash
       env:
-        SKETCH_NAME: ${{ inputs.sketch-name }}
-        CORE: ${{ inputs.core }}
-        BOARD: ${{ inputs.board }}
+        INPUT_SKETCH_NAME: ${{ inputs.sketch-name }}
+        INPUT_CORE: ${{ inputs.core }}
+        INPUT_BOARD: ${{ inputs.board }}
     - name: Create build info
       run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY
       shell: bash
