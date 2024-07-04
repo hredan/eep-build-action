@@ -12,6 +12,18 @@ inputs:
     description: 'Board to use'
     required: true
     default: 'd1_mini'
+  core-version: # core version
+    description: 'Core version to use'
+    required: false
+    default: ''
+  libs: # libraries to include
+    description: 'Libraries: comma separated Lib names e.g. U8g2,RTClib'
+    required: false
+    default: ''
+  cpu-frequency: # cpu frequency
+    description: 'CPU frequency: e.g. 80, 160 or 240'
+    required: false
+    default: '160'
 runs:
   using: 'composite'
   steps:
@@ -21,7 +33,7 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run build_sketch.sh
-      run: build_sketch.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
+      run: build_sketch.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }} -f ${{ inputs.cpu-frequency }} -v ${{ inputs.core-version }} -l ${{ inputs.libs }}
       shell: bash
     - name: Create build info
       run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY
