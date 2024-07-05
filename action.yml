@@ -41,7 +41,7 @@ runs:
         INPUT_BOARD: ${{ inputs.board }}
         INPUT_CORE_VERSION: ${{ inputs.core-version }}
         INPUT_LIBS: ${{ inputs.libs }}
-        INPUT_CPU_FREQUENCY: ${{ inputs.cpu-frequency }}
+        INPUT_CPU_F: ${{ inputs.cpu-frequency }}
     - name: Create build info
       run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY
       shell: bash
