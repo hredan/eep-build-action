@@ -92,8 +92,8 @@ fi
 
 if [ $CORE = "esp32" ]
 	then
-		BUILD_DIR=./BIN_ESP32_$BOARD
-		CACHE_DIR=./CACHE_ESP32
+		BUILD_DIR=./BIN_${CORE}_${BOARD}
+		CACHE_DIR=./CACHE_$CORE
 		CORE_URL="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json"
 		FQBN_PARA="esp32:esp32:$BOARD:FlashFreq=80,PartitionScheme=default,CPUFreq=$CPUF,UploadSpeed=921600"
 		if [ -z $CORE_VERSION ]; then CORE_NAME=esp32:esp32; else CORE_NAME=esp32:esp32@$CORE_VERSION; fi		
@@ -162,15 +162,15 @@ echo -e "### LIB Versions ###\n$LIBS_TEXT"
 OUPUT_NAME=${BOARD}_${SKETCH_NAME}
 if [ $CORE = "esp8266" ]; then
 	echo "Save $CORE data for eef package"
-	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write_flash\", \"0x0\", \"ESP8266_${OUPUT_NAME}.ino.bin\""
-	ESPTOOL_PARA_FS=", \"0x200000\", \"ESP8266_${SKETCH_NAME}_littlefs.bin\""
+	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write_flash\", \"0x0\", \"$CORE_${OUPUT_NAME}.ino.bin\""
+	ESPTOOL_PARA_FS=", \"0x200000\", \"$CORE_${SKETCH_NAME}_littlefs.bin\""
 
-	ESP8266_EEF_PATH=$EEP_DIR/ESP8266_${BOARD}_${SKETCH_NAME}.eef
-	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bin ${EEP_DIR}/ESP8266_${OUPUT_NAME}.ino.bin
+	ESP8266_EEF_PATH=$EEP_DIR/$CORE_${BOARD}_${SKETCH_NAME}.eef
+	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bin ${EEP_DIR}/$CORE_${OUPUT_NAME}.ino.bin
 	if [ $CHECK_DATA -eq 0 ]; then
 		echo -e "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}]\n}" > $ESP8266_EEF_PATH
 	else
-		cp ${BIN_DATA_DIR}/ESP8266_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
+		cp ${BIN_DATA_DIR}/$CORE_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
 		echo -e "{\n\t\"command\": [${ESPTOOL_PARA_ESP8266}${ESPTOOL_PARA_FS}]\n}" > $ESP8266_EEF_PATH
 	fi
 fi
@@ -178,9 +178,9 @@ fi
 if [ $CORE = "esp32" ]; then
 	echo "Save $CORE data for eef package"	
 	ESPTOOL_PARA_ESP32="\"command\": [\"--chip\", \"esp32\", \"--baud\", \"921600\", \"--before\", \"default_reset\", \"--after\", \"hard_reset\", \"write_flash\", \"-z\", \"--flash_mode\", \"dio\", \"--flash_freq\", \"80m\", \"--flash_size\", \"detect\""
-	ESPTOOL_PARA_ESP32_FILES=", \"0xe000\", \"boot_app0.bin\", \"0x1000\", \"ESP32_${OUPUT_NAME}.ino.bootloader.bin\", \"0x10000\", \"ESP32_${OUPUT_NAME}.ino.bin\", \"0x8000\", \"ESP32_${OUPUT_NAME}.ino.partitions.bin\""
-	ESPTOOL_PARA_ESP32_FS=", \"0x290000\", \"ESP32_${SKETCH_NAME}_littlefs.bin\""
-	ESP32_EEF_PATH=$EEP_DIR/ESP32_${OUPUT_NAME}.eef
+	ESPTOOL_PARA_ESP32_FILES=", \"0xe000\", \"boot_app0.bin\", \"0x1000\", \"$CORE_${OUPUT_NAME}.ino.bootloader.bin\", \"0x10000\", \"$CORE_${OUPUT_NAME}.ino.bin\", \"0x8000\", \"$CORE_${OUPUT_NAME}.ino.partitions.bin\""
+	ESPTOOL_PARA_ESP32_FS=", \"0x290000\", \"$CORE_${SKETCH_NAME}_littlefs.bin\""
+	ESP32_EEF_PATH=$EEP_DIR/$CORE_${OUPUT_NAME}.eef
 	
 	
 	if [ -z $CORE_VERSION ]; then
@@ -197,14 +197,14 @@ if [ $CORE = "esp32" ]; then
 		cp $BOOT_APP_PATH ${EEP_DIR}
 	fi 
 	
-	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bin ${EEP_DIR}/ESP32_${OUPUT_NAME}.ino.bin
-	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bootloader.bin ${EEP_DIR}/ESP32_${OUPUT_NAME}.ino.bootloader.bin
-	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.partitions.bin ${EEP_DIR}/ESP32_${OUPUT_NAME}.ino.partitions.bin
+	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bin ${EEP_DIR}/$CORE_${OUPUT_NAME}.ino.bin
+	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.bootloader.bin ${EEP_DIR}/$CORE_${OUPUT_NAME}.ino.bootloader.bin
+	cp ${BUILD_DIR}/${SKETCH_NAME}.ino.partitions.bin ${EEP_DIR}/$CORE_${OUPUT_NAME}.ino.partitions.bin
 	if [ $CHECK_DATA -eq 0 ]; then
 		echo -e "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}]\n}" > $ESP32_EEF_PATH
 	else
 		echo -e "{\n\t${ESPTOOL_PARA_ESP32}${ESPTOOL_PARA_ESP32_FILES}${ESPTOOL_PARA_ESP32_FS}]\n}" > $ESP32_EEF_PATH
-		cp ${BIN_DATA_DIR}/ESP32_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
+		cp ${BIN_DATA_DIR}/$CORE_${SKETCH_NAME}_littlefs.bin ${EEP_DIR}
 	fi
 fi
 
