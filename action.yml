@@ -48,4 +48,8 @@ runs:
     - name: Create eep package
       run: create_eep_package.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
       shell: bash
+    - uses: actions/upload-artifact@v4
+        with:
+          name: ${{inputs.core}}_${{inputs.board}}_${{inputs.sketch-name}}.zip
+          path: ./EEP/*
     
