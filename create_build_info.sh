@@ -35,8 +35,15 @@ esac
 EEP_DIR=./EEP
 INFO_FILE_PATH=$EEP_DIR/build_info.txt
 if [ -d $EEP_DIR ]; then
-    echo -e "Repository URL:  www.github.com/$REPO_NAME" > $INFO_FILE_PATH
-    echo -e "GITHUB_SHA:      $SHA" >> $INFO_FILE_PATH
+    # if $GITHUB_REPOSITORY is available, then script is running in GitHub Actions on GitHub Runner
+    if [ -n "$GITHUB_REPOSITORY" ]
+    then
+        echo -e "Repository URL: www.github.com/$REPO_NAME" > $INFO_FILE_PATH
+    else
+        echo -e "Repository URL: $REPO_NAME" > $INFO_FILE_PATH
+    fi
+    
+    echo -e "GITHUB_SHA:     $SHA" >> $INFO_FILE_PATH
     if [ ! -z ${TAG_NAME} ]; then
         echo -e "Release version: ${TAG_NAME}" >> $INFO_FILE_PATH
     fi

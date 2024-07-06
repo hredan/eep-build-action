@@ -153,7 +153,7 @@ if [ -d $BIN_DATA_DIR ]
 		CHECK_DATA=0
 fi
 
-CORE_TEXT=$($TOOL core search $CORE)
+CORE_TEXT=$($TOOL core search $CORE:$CORE)
 echo -e "### Core Version ###\n$CORE_TEXT"
 
 LIBS_TEXT=$($TOOL lib list)
