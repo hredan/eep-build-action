@@ -13,7 +13,7 @@ inputs:
     required: true
     default: 'd1_mini'
   core-version: # core version
-    description: 'Core version to use'
+    description: 'Core version of esp core e.g. 2.7.4'
     required: false
     default: ''
   libs: # libraries to include

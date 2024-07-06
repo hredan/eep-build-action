@@ -1,27 +1,42 @@
 ![SleepUINO_Logo_PreDev](https://user-images.githubusercontent.com/48091357/111156537-25298a00-8596-11eb-8726-1fe5cd7bed93.png)
-# ESP_Action_Build_Scripts
-ESP Action Build Scripts contains scripts to build Arduino ESP Projects in a GitHub Action 
-For example have a look to [ESP_jQuery_Mobile_Interface Actions](https://github.com/hredan/ESP_jQuery_Mobile_Interface/actions)
+# eep-build-action
+eep-build-action is a GitHub Action to build Arduino ESP Projects and create an eep package that can be used with the [ESPEASYFLASHER_2.0](https://github.com/hredan/ESPEASYFLASHER_2.0).
+To build the esp binaries, the eep-build-action is using the [arduino-cli](https://github.com/arduino/arduino-cli). The main sketch ino file must be in the root directory of the repository that is using the eep-build-action. If an data directory for a web interface is available, the eep-build-action is using [mklittlefs](https://github.com/earlephilhower/mklittlefs) to create a file system.
 
-# Add Scripts to your repository
-If you want use the scripts, you can add it easily as submodule
-```bash
-git submodule add https://github.com/hredan/ESP_Build_Scripts.git
-```
-# Script desciption
-## build_sketch.sh
-```
-build_sketch.sh -h
-Paramter:
- -c     CORE=esp8266 or esp32 (default esp8266)
- -b     BOARD e.g. d1_mini or d1_mini32 (default d1_mini)
- -f     CPU Frequence e.g. 80, 160 or 240 (default 160)
- -s     Sketch name (mandatory)!
- -v     core version (default last one)
- e.g. sh ./build_sketch.sh -s SKETCH_NAME
-```
+For example have a look to the [Example Projects](https://github.com/hredan/eep-build-action#example-projects).
+
+# Inputs of action
+
+The following inputs can be used as `step.with` keys:
+
+| Name               | Type        | Required | Description                                                                                                                          |
+|--------------------|-------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `sketch-name`      | String      | true     | Name of the main ino file without the extension ino e.g. "ESP_BLINK".                                                                |
+| `core`             | String      | true     | Name of the core. The value can be "esp32" or "esp8266", it depends on the hardware which you are using.                             |
+| `board`            | String      | true     | Name of the board. It depends on the board you are using. You can find a list of possible boards [ESP32 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP32), [ESP8266 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP8266) in the Wiki. You have to use the name in column "adruino-cli Name".     |
+| `libs`             | String      | false    | Libraries that are needed for the build. The Lib names must be comma separated without spaces e.g. `U8g2,RTClib`.                    |
+| `cpu-frequency`    | String      | false    | CPU frequency: e.g. 80, 160 or 240. Default is 160.                                                                                   |
+| `core-version`     | String      | false    | Version of [esp32](https://github.com/espressif/arduino-esp32) or [esp8266](https://github.com/esp8266/Arduino) core. Default latest.                                                                                   |
+
+# Output of action
+
+The action will create a GitHub artifact, that can be downloaded and used with the [ESPEASYFLASHER_2.0](https://github.com/hredan/ESPEASYFLASHER_2.0).
+
 # Example
-How the scripts are working in the GitHub Actions you can have a look to the following Projects:
+```
+build_ESP8266:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hredan/eep-build-action@v1
+        with:
+          sketch-name: <your sketch name>
+          core: esp8266
+          board: d1_mini
+```
+How the action is working in a GitHub workflow you can have a look to the following Projects:
+
+# Example Projects
 ## ESP_Blink
 [ESP_Blink Workflows](https://github.com/hredan/ESP_Blink/tree/master/.github/workflows)
 
@@ -32,4 +47,4 @@ How the scripts are working in the GitHub Actions you can have a look to the fol
 [ESP_jQuery_Mobile_Interface Actions](https://github.com/hredan/ESP_jQuery_Mobile_Interface/actions)
 
 # Disclaimer
-All this code is released under the GPL, and all of it is to be used at your own risk. If you find any bugs, please let me know via the GitHub issue tracker or drop me an email ([hredan@sleepuino.info](mailto:hredan@sleepuino.info)).
+All this code is released under the GPL, and all of it is to be used at your own risk. If you find any bugs, please let me know via the GitHub issue tracker or drop me an email ([hredan@sleepuino.de](mailto:hredan@sleepuino.de)).
