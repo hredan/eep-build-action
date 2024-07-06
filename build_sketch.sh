@@ -188,7 +188,20 @@ if [ $CORE = "esp32" ]; then
 		CORE_VERSION=$(echo $CORE_TEXT | gawk '{ match($0, /([0-9]+\.[0-9]+\.[0-9]+)/, arr); if(arr[1] != "") print arr[1] }')
 	fi
 	
-	BOOT_APP_PATH=~/.arduino15/packages/esp32/hardware/esp32/${CORE_VERSION}/tools/partitions/boot_app0.bin
+	case $OSTYPE in
+		linux-gnu)
+			BOOT_APP_PATH=~/.arduino15/packages/esp32/hardware/esp32/${CORE_VERSION}/tools/partitions/boot_app0.bin
+			;;
+		msys)
+			BOOT_APP_PATH=~/AppData/Local/Arduino15/packages/esp32/hardware/esp32/${CORE_VERSION}/tools/partitions/boot_app0.bin
+			;;
+		*)
+			echo "OS: $OSTYPE currently not supported!"
+			exit 1
+			;;
+	esac
+
+	
 	
 	if [ ! -f $BOOT_APP_PATH ]; then
 		echo "ERROR: could not find $BOOT_APP_PATH"
