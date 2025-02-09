@@ -3,15 +3,15 @@ TOOL_DIR="./tools"
 HELP="Paramter:\n
 -s\tGITHUB_SHA\n
 -r\tGITHUB_REPOSITORY\n
--t\tTAG_NAME\n
+-n\tGITHUB_REF_NAME\n
 e.g. sh ./create_build_info.sh -s \$GITHUB_SHA -r \$GITHUB_REPOSITORY\n"
 
-while getopts s:r:t:h flag
+while getopts s:r:n:h flag
 do
     case "${flag}" in
         s) SHA=${OPTARG};;
         r) REPO_NAME=${OPTARG};;
-        t) TAG_NAME=${OPTARG};;
+        n) TAG_NAME=${OPTARG};;
         h) echo -e $HELP; exit 0;
     esac
 done
@@ -42,8 +42,11 @@ if [ -d $EEP_DIR ]; then
     else
         echo -e "Repository URL: $REPO_NAME" > $INFO_FILE_PATH
     fi
-    
-    echo -e "GITHUB_SHA:     $SHA" >> $INFO_FILE_PATH
+
+    if [ ! -z ${SHA} ]; then
+        echo -e "GITHUB_SHA:     $SHA" >> $INFO_FILE_PATH
+    fi
+
     if [ ! -z ${TAG_NAME} ]; then
         echo -e "Release version: ${TAG_NAME}" >> $INFO_FILE_PATH
     fi
