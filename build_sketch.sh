@@ -48,14 +48,14 @@ if [ ! -f "$TOOL" ]; then
 	case $OSTYPE in
 		linux-gnu)
 			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz"
-			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/v${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
 			TOOL=./tools/arduino-cli
 			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
 			tar -xf ./$TOOL_ACHIVE_NAME
 			;;
 		msys)
 			TOOL_ACHIVE_NAME="arduino-cli_${ARDUINO_CLI_VERSION}_Windows_64bit.zip"
-			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
+			TOOL_URL="https://github.com/arduino/arduino-cli/releases/download/v${ARDUINO_CLI_VERSION}/$TOOL_ACHIVE_NAME"
 			TOOL=./tools/arduino-cli.exe
 			curl -kLSs $TOOL_URL -o $TOOL_ACHIVE_NAME
 			unzip -o $TOOL_ACHIVE_NAME
