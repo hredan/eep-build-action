@@ -3,6 +3,7 @@ SCRIPT_DIR=${0%/*}
 PARAMS=""
 
 echo Name: $INPUT_SKETCH_NAME
+echo Path: $INPUT_SKETCH_PATH
 echo Core: $INPUT_CORE
 echo Board: $INPUT_BOARD
 echo CPU_f:$INPUT_CPU_F
@@ -34,6 +35,6 @@ if [ -n "$INPUT_LIBS" ]; then
   PARAMS="$PARAMS -l $INPUT_LIBS"
 fi
 echo PARAMS: $PARAMS
-
+cd $INPUT_SKETCH_PATH
 # run build_sketch.sh with parameters
 $SCRIPT_DIR/build_sketch.sh $PARAMS

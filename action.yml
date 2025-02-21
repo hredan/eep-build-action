@@ -4,6 +4,10 @@ inputs:
   sketch-name: # name of main ino file
     description: 'Name of the main ino file'
     required: true
+  sketch-path: # path to sketch
+    description: 'Path to sketch'
+    required: false
+    default: '.'
   core: # core esp8266 or esp32
     description: 'Core to use'
     required: true
@@ -37,6 +41,7 @@ runs:
       shell: bash
       env:
         INPUT_SKETCH_NAME: ${{ inputs.sketch-name }}
+        INPUT_SKETCH_PATH: ${{ inputs.sketch-path }}
         INPUT_CORE: ${{ inputs.core }}
         INPUT_BOARD: ${{ inputs.board }}
         INPUT_CORE_VERSION: ${{ inputs.core-version }}
