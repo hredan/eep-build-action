@@ -48,14 +48,18 @@ runs:
         INPUT_LIBS: ${{ inputs.libs }}
         INPUT_CPU_F: ${{ inputs.cpu-frequency }}
     - name: Create build info
+      shell: bash
       # GITHUB_REF_NAME: in case of a tag, this will be the tag name, otherwise it will be the branch name
-      run: create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY -n $GITHUB_REF_NAME
-      shell: bash
+      run: |
+        cd ${{ inputs.sketch-path }}
+        create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY -n $GITHUB_REF_NAME
     - name: Create eep package
-      run: create_eep_package.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
       shell: bash
+      run: |
+        cd ${{ inputs.sketch-path }}
+        create_eep_package.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
     - uses: actions/upload-artifact@v4
       with:
         name: ${{inputs.core}}_${{inputs.board}}_${{inputs.sketch-name}}
-        path: ./EEP/*
+        path: ${{ inputs.sketch-path }}/EEP/*
     
