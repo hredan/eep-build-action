@@ -12,6 +12,8 @@ The following inputs can be used as `step.with` keys:
 | Name               | Type        | Required | Description                                                                                                                          |
 |--------------------|-------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `sketch-name`      | String      | true     | Name of the main ino file without the extension ino e.g. "ESP_BLINK".                                                                |
+| `sketch-path`      | String      | false    | Path of Sketch (Default '.')                                                                                                         |
+| `eep-name`         | String      | false    | Name of eep package (Default ''). If it is an empty string then the sketch-name will be used for the eep-name.                       |
 | `core`             | String      | true     | Name of the core. The value can be "esp32" or "esp8266", it depends on the hardware which you are using.                             |
 | `board`            | String      | true     | Name of the board. It depends on the board you are using. You can find a list of possible boards [ESP32 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP32), [ESP8266 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP8266) in the Wiki. You have to use the name in column "adruino-cli Name".     |
 | `libs`             | String      | false    | Libraries that are needed for the build. The Lib names must be comma separated without spaces e.g. `U8g2,RTClib`.                    |

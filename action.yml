@@ -8,6 +8,10 @@ inputs:
     description: 'Path to sketch'
     required: false
     default: '.'
+  eep-name: # name of eep file
+    description: 'Name of the eep file'
+    required: false
+    default: ''
   core: # core esp8266 or esp32
     description: 'Core to use'
     required: true
@@ -57,7 +61,8 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.sketch-path }}
-        create_eep_package.sh -s ${{ inputs.sketch-name }} -c ${{ inputs.core }} -b ${{ inputs.board }}
+        EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; elso echo ${{ inputs.eep-name }}; fi )"
+        create_eep_package.sh -s $EEP_NAME -c ${{ inputs.core }} -b ${{ inputs.board }}
     - uses: actions/upload-artifact@v4
       with:
         name: ${{inputs.core}}_${{inputs.board}}_${{inputs.sketch-name}}
