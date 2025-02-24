@@ -61,7 +61,7 @@ runs:
       shell: bash
       run: |
         cd ${{ inputs.sketch-path }}
-        EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; elso echo ${{ inputs.eep-name }}; fi )"
+        EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; else echo ${{ inputs.eep-name }}; fi )"
         create_eep_package.sh -s $EEP_NAME -c ${{ inputs.core }} -b ${{ inputs.board }}
     - uses: actions/upload-artifact@v4
       with:
