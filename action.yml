@@ -59,6 +59,7 @@ runs:
         create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY -n $GITHUB_REF_NAME
     - name: Set EEP Name
       id: set_eep_name
+      shell: bash
       run: |
         EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; else echo ${{ inputs.eep-name }}; fi )"
         echo "eep_name=$EEP_NAME" >> $GITHUB_OUTPUT
