@@ -57,14 +57,20 @@ runs:
       run: |
         cd ${{ inputs.sketch-path }}
         create_build_info.sh -s $GITHUB_SHA -r $GITHUB_REPOSITORY -n $GITHUB_REF_NAME
-    - name: Create eep package
-      shell: bash
+    - name: Set EEP Name
+      id: set_eep_name
       run: |
-        cd ${{ inputs.sketch-path }}
         EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; else echo ${{ inputs.eep-name }}; fi )"
-        create_eep_package.sh -s $EEP_NAME -c ${{ inputs.core }} -b ${{ inputs.board }}
+        echo "eep_name=$EEP_NAME" >> $GITHUB_OUTPUT
+    # Not needed, because of EEP Folder will be ziped during upload-artifact
+    # - name: Create eep package
+    #   shell: bash
+    #   run: |
+    #     cd ${{ inputs.sketch-path }}
+    #     EEP_NAME="$( if [ -z ${{ inputs.eep-name }} ]; then echo ${{ inputs.sketch-name }}; else echo ${{ inputs.eep-name }}; fi )"
+    #     create_eep_package.sh -s $EEP_NAME -c ${{ inputs.core }} -b ${{ inputs.board }}
     - uses: actions/upload-artifact@v4
       with:
-        name: ${{inputs.core}}_${{inputs.board}}_${{inputs.sketch-name}}
+        name: ${{inputs.core}}_${{inputs.board}}_${{steps.set_eep_name.outputs.eep_name}}
         path: ${{ inputs.sketch-path }}/EEP/*
     
