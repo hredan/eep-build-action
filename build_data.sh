@@ -2,7 +2,8 @@
 TOOL_DIR="./tools"
 # https://github.com/earlephilhower/mklittlefs
 MKLITTLEFS_VERSION="4.0.2"
-TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"
+# https://github.com/earlephilhower/mklittlefs/releases/download/4.0.2/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz
+TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz"
 TOOL=./tools/mklittlefs/mklittlefs
 DATA_DIR=./data
 
