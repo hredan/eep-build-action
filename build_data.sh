@@ -2,8 +2,9 @@
 TOOL_DIR="./tools"
 # https://github.com/earlephilhower/mklittlefs
 MKLITTLEFS_VERSION="4.0.2"
+MKLITTLEFS_HASH="db0513a"
 # https://github.com/earlephilhower/mklittlefs/releases/download/4.0.2/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz
-TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz"
+# TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz"
 TOOL=./tools/mklittlefs/mklittlefs
 DATA_DIR=./data
 
@@ -46,14 +47,14 @@ if [ -d "$DATA_DIR" ]; then
 
 			case $OSTYPE in
 				linux-gnu)
-					ARCHIVE_NAME="x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"
+					ARCHIVE_NAME="x86_64-linux-gnu-mklittlefs-$MKLITTLEFS_HASH.tar.gz"
 					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
 					TOOL=./tools/mklittlefs/mklittlefs
 					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
 					tar -xf ./$ARCHIVE_NAME
 					;;
 				msys)
-					ARCHIVE_NAME="x86_64-w64-mingw32-mklittlefs-295fe9b.zip"
+					ARCHIVE_NAME="x86_64-w64-mingw32-mklittlefs-$MKLITTLEFS_HASH.zip"
 					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
 					TOOL=./tools/mklittlefs/mklittlefs
 					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
