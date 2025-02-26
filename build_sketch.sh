@@ -1,7 +1,8 @@
 #!/bin/bash
 SCRIPT_DIR=${0%/*}
 TOOL_DIR="./tools"
-ARDUINO_CLI_VERSION="1.1.1"
+# https://github.com/arduino/arduino-cli
+ARDUINO_CLI_VERSION="1.2.0"
 
 BIN_DATA_DIR=./BIN_DATA
 

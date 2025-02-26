@@ -1,6 +1,7 @@
 #!/bin/bash
 TOOL_DIR="./tools"
-MKLITTLEFS_VERSION="3.0.0"
+# https://github.com/earlephilhower/mklittlefs
+MKLITTLEFS_VERSION="4.0.2"
 TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-295fe9b.tar.gz"
 TOOL=./tools/mklittlefs/mklittlefs
 DATA_DIR=./data
