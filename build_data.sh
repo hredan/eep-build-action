@@ -1,8 +1,8 @@
 #!/bin/bash
 TOOL_DIR="./tools"
 # https://github.com/earlephilhower/mklittlefs
-MKLITTLEFS_VERSION="4.0.2"
-MKLITTLEFS_HASH="db0513a"
+MKLITTLEFS_VERSION="3.0.0"
+MKLITTLEFS_HASH="295fe9b"
 # https://github.com/earlephilhower/mklittlefs/releases/download/4.0.2/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz
 # TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/x86_64-linux-gnu-mklittlefs-db0513a.tar.gz"
 TOOL=./tools/mklittlefs/mklittlefs
@@ -50,14 +50,24 @@ if [ -d "$DATA_DIR" ]; then
 					ARCHIVE_NAME="x86_64-linux-gnu-mklittlefs-$MKLITTLEFS_HASH.tar.gz"
 					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
 					TOOL=./tools/mklittlefs/mklittlefs
-					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
+					curl -fkLSs $TOOL_URL -o $ARCHIVE_NAME
+					retVal=$?
+					if [ $retVal -ne 0 ]; then
+						echo "curl Error"
+						exit $retVal
+					fi
 					tar -xf ./$ARCHIVE_NAME
 					;;
 				msys)
 					ARCHIVE_NAME="x86_64-w64-mingw32-mklittlefs-$MKLITTLEFS_HASH.zip"
 					TOOL_URL="https://github.com/earlephilhower/mklittlefs/releases/download/$MKLITTLEFS_VERSION/$ARCHIVE_NAME"
 					TOOL=./tools/mklittlefs/mklittlefs
-					curl -kLSs $TOOL_URL -o $ARCHIVE_NAME
+					curl -fkLSs $TOOL_URL -o $ARCHIVE_NAME
+					retVal=$?
+					if [ $retVal -ne 0 ]; then
+						echo "curl Error"
+						exit $retVal
+					fi
 					unzip ./$ARCHIVE_NAME
 					;;
 				*)
