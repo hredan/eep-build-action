@@ -80,7 +80,7 @@ if [ -d "$DATA_DIR" ]; then
 	mkdir ./BIN_DATA
 
 	if [ $CORE = "esp32" ]; then
-		$TOOL -c ./data -p 256 -b 4096 -s 1507328 ./BIN_DATA/esp32_${SKETCH_NAME}_littlefs.bin
+		$TOOL -c ./data -p 256 -b 4096 -s 1441792 ./BIN_DATA/esp32_${SKETCH_NAME}_littlefs.bin
 	else
 		$TOOL -c ./data -p 256 -b 8192 -s 2072576 ./BIN_DATA/esp8266_${SKETCH_NAME}_littlefs.bin		
 	fi
