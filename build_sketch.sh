@@ -94,13 +94,11 @@ fi
 if [ $CORE = "esp32" ]
 	then
 		BUILD_DIR=./BIN_${CORE}_${BOARD}
-		CACHE_DIR=./CACHE_${CORE}
 		CORE_URL="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json"
 		FQBN_PARA="esp32:esp32:$BOARD:FlashFreq=80,PartitionScheme=default,CPUFreq=$CPUF,UploadSpeed=921600"
 		if [ -z $CORE_VERSION ]; then CORE_NAME=esp32:esp32; else CORE_NAME=esp32:esp32@$CORE_VERSION; fi		
 	else	
 		BUILD_DIR=./BIN_ESP8266_$BOARD
-		CACHE_DIR=./CACHE_ESP8266
 		CORE_URL="https://arduino.esp8266.com/stable/package_esp8266com_index.json"
 		FQBN_PARA="esp8266:esp8266:$BOARD:xtal=$CPUF,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,ip=hb2f,dbg=Disabled,lvl=None____,wipe=none,baud=921600"
 		if [ -z $CORE_VERSION ]; then CORE_NAME=esp8266:esp8266; else CORE_NAME=esp8266:esp8266@$CORE_VERSION; fi
@@ -112,7 +110,6 @@ fi
 
 echo "## Create output directories ##"
 mkdir $BUILD_DIR
-mkdir $CACHE_DIR
 
 echo "## install core ##"
 $TOOL core update-index --additional-urls $CORE_URL
@@ -131,7 +128,7 @@ do
 done
 
 echo "## Start compiling ##"
-$TOOL compile --fqbn $FQBN_PARA --build-path $BUILD_DIR --build-cache-path $CACHE_DIR $SKETCH_NAME.ino
+$TOOL compile --fqbn $FQBN_PARA --build-path $BUILD_DIR $SKETCH_NAME.ino
 if [ "$?" -ne "0" ]; then
 	echo "Compilation failed with errorcode $?"
 	exit 1
