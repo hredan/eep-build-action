@@ -18,7 +18,7 @@ The following inputs can be used as `step.with` keys:
 | `board`            | String      | true     | Name of the board. It depends on the board you are using. You can find a list of possible boards [ESP32 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP32), [ESP8266 Boards](https://github.com/hredan/eep-build-action/wiki/BoardESP8266) in the Wiki. You have to use the name in column "adruino-cli Name".     |
 | `libs`             | String      | false    | Libraries that are needed for the build. The Lib names must be comma separated without spaces e.g. `U8g2,RTClib`.                    |
 | `cpu-frequency`    | String      | false    | CPU frequency: e.g. 80, 160 or 240. Default is 160.                                                                                   |
-| `core-version`     | String      | false    | Version of [esp32](https://github.com/espressif/arduino-esp32) or [esp8266](https://github.com/esp8266/Arduino) core. Default latest.                                                                                   |
+| `core-version`     | String      | false    | Version of [esp32](https://github.com/espressif/arduino-esp32) or [esp8266](https://github.com/esp8266/Arduino) core. Default last stable release.                                                                                   |
 
 # Output of action
 

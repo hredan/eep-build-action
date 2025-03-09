@@ -94,7 +94,8 @@ fi
 if [ $CORE = "esp32" ]
 	then
 		BUILD_DIR=./BIN_${CORE}_${BOARD}
-		CORE_URL="https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json"
+		# last stable release
+		CORE_URL="https://espressif.github.io/arduino-esp32/package_esp32_index.json"
 		FQBN_PARA="esp32:esp32:$BOARD:FlashFreq=80,PartitionScheme=default,CPUFreq=$CPUF,UploadSpeed=921600"
 		if [ -z $CORE_VERSION ]; then CORE_NAME=esp32:esp32; else CORE_NAME=esp32:esp32@$CORE_VERSION; fi		
 	else	
