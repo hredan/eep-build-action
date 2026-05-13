@@ -161,7 +161,7 @@ echo -e "### LIB Versions ###\n$LIBS_TEXT"
 OUPUT_NAME=${BOARD}_${SKETCH_NAME}
 if [ $CORE = "esp8266" ]; then
 	echo "Save $CORE data for eef package"
-	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write_flash\", \"0x0\", \"${CORE}_${OUPUT_NAME}.ino.bin\""
+	ESPTOOL_PARA_ESP8266="\"--baud\", \"460800\", \"write-flash\", \"0x0\", \"${CORE}_${OUPUT_NAME}.ino.bin\""
 	ESPTOOL_PARA_FS=", \"0x200000\", \"${CORE}_${SKETCH_NAME}_littlefs.bin\""
 
 	ESP8266_EEF_PATH=$EEP_DIR/${CORE}_${BOARD}_${SKETCH_NAME}.eef
@@ -176,7 +176,7 @@ fi
 
 if [ $CORE = "esp32" ]; then
 	echo "Save $CORE data for eef package"	
-	ESPTOOL_PARA_ESP32="\"command\": [\"--chip\", \"esp32\", \"--baud\", \"921600\", \"--before\", \"default_reset\", \"--after\", \"hard_reset\", \"write_flash\", \"-z\", \"--flash_mode\", \"dio\", \"--flash_freq\", \"80m\", \"--flash_size\", \"detect\""
+	ESPTOOL_PARA_ESP32="\"command\": [\"--chip\", \"esp32\", \"--baud\", \"921600\", \"--before\", \"default_reset\", \"--after\", \"hard_reset\", \"write-flash\", \"-z\", \"--flash_mode\", \"dio\", \"--flash_freq\", \"80m\", \"--flash_size\", \"detect\""
 	ESPTOOL_PARA_ESP32_FILES=", \"0xe000\", \"boot_app0.bin\", \"0x1000\", \"${CORE}_${OUPUT_NAME}.ino.bootloader.bin\", \"0x10000\", \"${CORE}_${OUPUT_NAME}.ino.bin\", \"0x8000\", \"${CORE}_${OUPUT_NAME}.ino.partitions.bin\""
 	ESPTOOL_PARA_ESP32_FS=", \"0x290000\", \"${CORE}_${SKETCH_NAME}_littlefs.bin\""
 	ESP32_EEF_PATH=$EEP_DIR/${CORE}_${OUPUT_NAME}.eef
