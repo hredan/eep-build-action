@@ -45,7 +45,7 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run build_sketch.py
-      run: python build_sketch.py
+      run: python $GITHUB_ACTION_PATH/build_sketch.py
       shell: bash
       env:
         INPUT_SKETCH_NAME: ${{ inputs.sketch-name }}
