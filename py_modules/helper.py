@@ -39,14 +39,14 @@ def download_file(url, save_path):
 
 def download_json_files():
     urls = [
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_partitions.json",
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32.json",
         "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_partition_schemes.json",
         "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_mcu_bootloader_addr.json"
     ]
     
     for url in urls:
         filename = os.path.basename(url)
-        save_path = os.path.join("esp_core_info", filename)
+        save_path = os.path.join("./esp_core_info", filename)
         if not os.path.exists(save_path):
             download_file(url, save_path)
 
@@ -134,6 +134,34 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
 
 def download_arduino_cli(version):
     url = f"https://downloads.arduino.cc/arduino-cli/arduino-cli_{version}_Linux_64bit.tar.gz"
-    save_path = os.path.join("tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
+    save_path = os.path.join("./tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
     if not os.path.exists(save_path):
         download_file(url, save_path)
+
+def install_libs(libs):
+    if libs:
+        for lib in libs.split(","):
+            lib = lib.strip()
+            if lib:
+                print(f"Installing library: {lib}")
+                result = run_bash_command(f"./tools/arduino-cli lib install {lib}", stream_output=True)
+                if not result["success"]:
+                    print(f"Error installing library {lib}:\n{result['stderr']}")
+                    exit(1)
+
+def install_core(core, version=None):
+    if version:
+        core = f"{core}:{core}@{version}"
+    else:
+        core = f"{core}:{core}"
+    print(f"Installing core: {core} version {version}")
+    CORE_URL="https://espressif.github.io/arduino-esp32/package_esp32_index.json"
+    result = run_bash_command(f"./tools/arduino-cli core update-index --additional-urls {CORE_URL}", stream_output=True)
+    if not result["success"]:
+        print(f"Error updating core index:\n{result['stderr']}")
+        exit(1)
+
+    result = run_bash_command(f"./tools/arduino-cli core install {core}", stream_output=True)
+    if not result["success"]:
+        print(f"Error installing core {core} version {version}:\n{result['stderr']}")
+        exit(1)

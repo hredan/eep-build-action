@@ -3,6 +3,7 @@ from py_modules import helper
 from py_modules.esp32_info import Esp32Info
 
 if __name__ == "__main__":
+    print("Current Directory:", os.getcwd())
     helper.download_json_files()
     esp32_info = Esp32Info()
 
@@ -28,3 +29,15 @@ if __name__ == "__main__":
             print(f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
             exit(1)
     print(f"INPUT_SKETCH_NAME: {os.environ.get('INPUT_SKETCH_NAME')}")
+    sketch_name = os.environ.get("INPUT_SKETCH_NAME")
+    core = os.environ.get("INPUT_CORE")
+    board = os.environ.get("INPUT_BOARD")
+    core_version = os.environ.get("INPUT_CORE_VERSION")
+    libs = os.environ.get("INPUT_LIBS")
+    cpu_frequency = os.environ.get("INPUT_CPU_F")
+
+    mcu = esp32_info.get_mcu_for_board(board)
+    bootloader_addr = esp32_info.get_bootloader_address_for_mcu(mcu)
+
+    helper.install_core(core, core_version)
+    helper.install_libs(libs)
