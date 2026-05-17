@@ -41,3 +41,9 @@ if __name__ == "__main__":
 
     helper.install_core(core, core_version)
     helper.install_libs(libs)
+
+    FQBN_PARA=f"esp32:esp32:{board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
+    build_path = f"./BIN_{core}_{board}"
+    helper.compile_sketch(sketch_name, build_path, FQBN_PARA, cpu_freq=cpu_frequency)
+
+    
