@@ -35,13 +35,17 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.x'
     - name: Set GitHub Path
       run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
       shell: bash
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
-    - name: Run build_sketch.sh
-      run: start_action.sh
+    - name: Run build_sketch.py
+      run: python build_sketch.py
       shell: bash
       env:
         INPUT_SKETCH_NAME: ${{ inputs.sketch-name }}

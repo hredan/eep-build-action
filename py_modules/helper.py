@@ -1,6 +1,7 @@
 import requests
 import os
 import subprocess
+import threading
 
 def download_file(url, save_path):
     """
@@ -50,37 +51,78 @@ def download_json_files():
             download_file(url, save_path)
 
 
-def run_bash_command(command, cwd=None, timeout=120):
+def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
     """
     Runs a command in bash and returns a structured result.
 
     :param command: Command string to execute
     :param cwd: Optional working directory
     :param timeout: Timeout in seconds
+    :param stream_output: Print stdout/stderr as they are produced
     :return: dict with success, returncode, stdout, and stderr
     """
     try:
-        result = subprocess.run(
+        if not stream_output:
+            result = subprocess.run(
+                ["bash", "-lc", command],
+                cwd=cwd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False,
+            )
+
+            return {
+                "success": result.returncode == 0,
+                "returncode": result.returncode,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+            }
+
+        process = subprocess.Popen(
             ["bash", "-lc", command],
             cwd=cwd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=timeout,
-            check=False,
+            bufsize=1,
         )
 
+        stdout_lines = []
+        stderr_lines = []
+
+        def stream(pipe, collected, prefix):
+            for line in iter(pipe.readline, ""):
+                collected.append(line)
+                print(f"{prefix}{line}", end="", flush=True)
+            pipe.close()
+
+        stdout_thread = threading.Thread(target=stream, args=(process.stdout, stdout_lines, ""))
+        stderr_thread = threading.Thread(target=stream, args=(process.stderr, stderr_lines, ""))
+        stdout_thread.start()
+        stderr_thread.start()
+
+        try:
+            returncode = process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            stdout_thread.join()
+            stderr_thread.join()
+            return {
+                "success": False,
+                "returncode": None,
+                "stdout": "".join(stdout_lines),
+                "stderr": f"Command timed out after {timeout} seconds.",
+            }
+
+        stdout_thread.join()
+        stderr_thread.join()
+
         return {
-            "success": result.returncode == 0,
-            "returncode": result.returncode,
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-        }
-    except subprocess.TimeoutExpired as e:
-        return {
-            "success": False,
-            "returncode": None,
-            "stdout": e.stdout or "",
-            "stderr": f"Command timed out after {timeout} seconds.",
+            "success": returncode == 0,
+            "returncode": returncode,
+            "stdout": "".join(stdout_lines),
+            "stderr": "".join(stderr_lines),
         }
     except Exception as e:
         return {
