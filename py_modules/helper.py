@@ -89,3 +89,9 @@ def run_bash_command(command, cwd=None, timeout=120):
             "stdout": "",
             "stderr": f"Unexpected error while running command: {e}",
         }
+
+def download_arduino_cli(version):
+    url = f"https://downloads.arduino.cc/arduino-cli/arduino-cli_{version}_Linux_64bit.tar.gz"
+    save_path = os.path.join("tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
+    if not os.path.exists(save_path):
+        download_file(url, save_path)
