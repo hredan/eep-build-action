@@ -2,6 +2,7 @@ import requests
 import os
 import subprocess
 import threading
+import shutil
 
 def download_file(url, save_path):
     """
@@ -39,6 +40,11 @@ def download_file(url, save_path):
 
 def download_json_files():
     urls = [
+        ### core list
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/core_list.json",
+        ### esp8266
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp8266.json",
+        #### esp32
         "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32.json",
         "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_partition_schemes.json",
         "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_mcu_bootloader_addr.json"
@@ -175,3 +181,112 @@ def compile_sketch(sketch_name, build_path,fqbn, cpu_freq=None):
     if not result["success"]:
         print(f"Error compiling sketch:\n{result['stderr']}")
         exit(1)
+
+
+def create_eep_dir(config):
+    eep_dir="./EEP"
+    bin_data_dir="./BIN_DATA"
+    os.makedirs(eep_dir, exist_ok=True)
+
+    # Keep folder, but clear old package files before copying new artifacts.
+    for entry in os.listdir(eep_dir):
+        entry_path = os.path.join(eep_dir, entry)
+        if os.path.isdir(entry_path):
+            shutil.rmtree(entry_path)
+        else:
+            os.remove(entry_path)
+
+    output_name = f"{config['board']}_{config['sketch_name']}"
+    littlefs_name = f"{config['core']}_{config['sketch_name']}_littlefs.bin"
+    littlefs_src = os.path.join(bin_data_dir, littlefs_name)
+    has_littlefs = os.path.exists(littlefs_src)
+
+    if config['core'] == "esp8266":
+        app_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bin")
+        app_dst_name = f"{config['core']}_{output_name}.ino.bin"
+        app_dst = os.path.join(eep_dir, app_dst_name)
+        shutil.copy2(app_src, app_dst)
+
+        eef_path = os.path.join(eep_dir, f"{config['core']}_{config['board']}_{config['sketch_name']}.eef")
+        command = [
+            "--baud",
+            "460800",
+            "write-flash",
+            "0x0",
+            app_dst_name,
+        ]
+
+        if has_littlefs:
+            shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
+            command.extend(["0x200000", littlefs_name])
+
+        with open(eef_path, "w", encoding="utf-8") as file:
+            file.write('{\n\t"command": [')
+            file.write(", ".join(f'"{item}"' for item in command))
+            file.write("]\n}")
+
+    elif config['core'] == "esp32":
+        app_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bin")
+        bootloader_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bootloader.bin")
+        partitions_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.partitions.bin")
+
+        app_dst_name = f"{config['core']}_{output_name}.ino.bin"
+        bootloader_dst_name = f"{config['core']}_{output_name}.ino.bootloader.bin"
+        partitions_dst_name = f"{config['core']}_{output_name}.ino.partitions.bin"
+
+        shutil.copy2(app_src, os.path.join(eep_dir, app_dst_name))
+        shutil.copy2(bootloader_src, os.path.join(eep_dir, bootloader_dst_name))
+        shutil.copy2(partitions_src, os.path.join(eep_dir, partitions_dst_name))
+
+        BOOT_APP_PATH=f"~/.arduino15/packages/esp32/hardware/esp32/{config['core_version']}/tools/partitions/boot_app0.bin"
+        boot_app_src = os.path.expanduser(BOOT_APP_PATH)
+        if not os.path.exists(boot_app_src):
+            raise FileNotFoundError(f"Missing required file for ESP32 EEP package: {boot_app_src}")
+        shutil.copy2(boot_app_src, os.path.join(eep_dir, "boot_app0.bin"))
+
+        if not config.get("bootloader_addr"):
+            bootloader_addr = "0x1000"
+
+        eef_path = os.path.join(eep_dir, f"{config['core']}_{output_name}.eef")
+        command = [
+            "--chip",
+            "esp32",
+            "--baud",
+            "921600",
+            "--before",
+            "default_reset",
+            "--after",
+            "hard_reset",
+            "write-flash",
+            "-z",
+            "--flash_mode",
+            "dio",
+            "--flash_freq",
+            "80m",
+            "--flash_size",
+            "detect",
+            "0xe000",
+            "boot_app0.bin",
+            bootloader_addr,
+            bootloader_dst_name,
+            "0x10000",
+            app_dst_name,
+            "0x8000",
+            partitions_dst_name,
+        ]
+
+        if has_littlefs:
+            shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
+            command.extend(["0x290000", littlefs_name])
+
+        with open(eef_path, "w", encoding="utf-8") as file:
+            file.write('{\n\t"command": [')
+            file.write(", ".join(f'"{item}"' for item in command))
+            file.write("]\n}")
+    else:
+        raise ValueError(f"Unsupported core for EEP package creation: {config['core']}")
+
+    readme_path = os.path.join(eep_dir, "readme.txt")
+    if not os.path.exists(readme_path):
+        with open(readme_path, "w", encoding="utf-8") as file:
+            file.write("This package can be used with ESPEasyFlasher2.0 (https://github.com/hredan/ESPEASYFLASHER_2.0)\n")

@@ -1,11 +1,13 @@
 import os
 from py_modules import helper
-from py_modules.esp32_info import Esp32Info
+from py_modules.build_config import BuildConfig
 
 if __name__ == "__main__":
     print("Current Directory:", os.getcwd())
     helper.download_json_files()
-    esp32_info = Esp32Info()
+
+    build_config = BuildConfig()
+    config = build_config.get_config()
 
     # download and install Arduino CLI
     ARDUINO_CLI_VERSION="1.4.1"
@@ -28,22 +30,12 @@ if __name__ == "__main__":
         else:
             print(f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
             exit(1)
-    print(f"INPUT_SKETCH_NAME: {os.environ.get('INPUT_SKETCH_NAME')}")
-    sketch_name = os.environ.get("INPUT_SKETCH_NAME")
-    core = os.environ.get("INPUT_CORE")
-    board = os.environ.get("INPUT_BOARD")
-    core_version = os.environ.get("INPUT_CORE_VERSION")
-    libs = os.environ.get("INPUT_LIBS")
-    cpu_frequency = os.environ.get("INPUT_CPU_F")
 
-    mcu = esp32_info.get_mcu_for_board(board)
-    bootloader_addr = esp32_info.get_bootloader_address_for_mcu(mcu)
 
-    helper.install_core(core, core_version)
-    helper.install_libs(libs)
+    helper.install_core(config["core"], config["core_version"])
+    helper.install_libs(config["libs"])
 
-    FQBN_PARA=f"esp32:esp32:{board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
-    build_path = f"./BIN_{core}_{board}"
-    helper.compile_sketch(sketch_name, build_path, FQBN_PARA, cpu_freq=cpu_frequency)
-
-    
+    FQBN_PARA=f"esp32:esp32:{config["board"]}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
+    build_path = f"./BIN_{config["core"]}_{config["board"]}"
+    helper.compile_sketch(config["sketch_name"], build_path, FQBN_PARA, cpu_freq=config["cpu_frequency"])
+    helper.create_eep_dir(config)
