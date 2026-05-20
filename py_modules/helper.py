@@ -4,6 +4,8 @@ import subprocess
 import threading
 import shutil
 
+from py_modules.build_config import BuildConfig
+
 def download_file(url, save_path):
     """
     Downloads a file from a URL and saves it locally.
@@ -183,7 +185,7 @@ def compile_sketch(sketch_name, build_path,fqbn, cpu_freq=None):
         exit(1)
 
 
-def create_eep_dir(config):
+def create_eep_dir(config: BuildConfig):
     eep_dir="./EEP"
     bin_data_dir="./BIN_DATA"
     os.makedirs(eep_dir, exist_ok=True)
@@ -196,18 +198,18 @@ def create_eep_dir(config):
         else:
             os.remove(entry_path)
 
-    output_name = f"{config['board']}_{config['sketch_name']}"
-    littlefs_name = f"{config['core']}_{config['sketch_name']}_littlefs.bin"
+    output_name = f"{config.board}_{config.sketch_name}"
+    littlefs_name = f"{config.core}_{config.sketch_name}_littlefs.bin"
     littlefs_src = os.path.join(bin_data_dir, littlefs_name)
     has_littlefs = os.path.exists(littlefs_src)
 
-    if config['core'] == "esp8266":
-        app_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bin")
-        app_dst_name = f"{config['core']}_{output_name}.ino.bin"
+    if config.core == "esp8266":
+        app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
+        app_dst_name = f"{config.core}_{output_name}.ino.bin"
         app_dst = os.path.join(eep_dir, app_dst_name)
         shutil.copy2(app_src, app_dst)
 
-        eef_path = os.path.join(eep_dir, f"{config['core']}_{config['board']}_{config['sketch_name']}.eef")
+        eef_path = os.path.join(eep_dir, f"{config.core}_{config.board}_{config.sketch_name}.eef")
         command = [
             "--baud",
             "460800",
@@ -225,32 +227,30 @@ def create_eep_dir(config):
             file.write(", ".join(f'"{item}"' for item in command))
             file.write("]\n}")
 
-    elif config['core'] == "esp32":
-        app_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bin")
-        bootloader_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.bootloader.bin")
-        partitions_src = os.path.join(config["build_path"], f"{config['sketch_name']}.ino.partitions.bin")
+    elif config.core == "esp32":
+        app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
+        bootloader_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bootloader.bin")
+        partitions_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.partitions.bin")
 
-        app_dst_name = f"{config['core']}_{output_name}.ino.bin"
-        bootloader_dst_name = f"{config['core']}_{output_name}.ino.bootloader.bin"
-        partitions_dst_name = f"{config['core']}_{output_name}.ino.partitions.bin"
+        app_dst_name = f"{config.core}_{output_name}.ino.bin"
+        bootloader_dst_name = f"{config.core}_{output_name}.ino.bootloader.bin"
+        partitions_dst_name = f"{config.core}_{output_name}.ino.partitions.bin"
 
         shutil.copy2(app_src, os.path.join(eep_dir, app_dst_name))
         shutil.copy2(bootloader_src, os.path.join(eep_dir, bootloader_dst_name))
         shutil.copy2(partitions_src, os.path.join(eep_dir, partitions_dst_name))
 
-        BOOT_APP_PATH=f"~/.arduino15/packages/esp32/hardware/esp32/{config['core_version']}/tools/partitions/boot_app0.bin"
+        BOOT_APP_PATH=f"~/.arduino15/packages/esp32/hardware/esp32/{config.core_version}/tools/partitions/boot_app0.bin"
         boot_app_src = os.path.expanduser(BOOT_APP_PATH)
         if not os.path.exists(boot_app_src):
             raise FileNotFoundError(f"Missing required file for ESP32 EEP package: {boot_app_src}")
         shutil.copy2(boot_app_src, os.path.join(eep_dir, "boot_app0.bin"))
 
-        if not config.get("bootloader_addr"):
-            bootloader_addr = "0x1000"
 
-        eef_path = os.path.join(eep_dir, f"{config['core']}_{output_name}.eef")
+        eef_path = os.path.join(eep_dir, f"{config.core}_{output_name}.eef")
         command = [
             "--chip",
-            "esp32",
+            config.get_mcu(),
             "--baud",
             "921600",
             "--before",
@@ -267,7 +267,7 @@ def create_eep_dir(config):
             "detect",
             "0xe000",
             "boot_app0.bin",
-            bootloader_addr,
+            config.get_bootloader_address(),
             bootloader_dst_name,
             "0x10000",
             app_dst_name,
@@ -284,7 +284,7 @@ def create_eep_dir(config):
             file.write(", ".join(f'"{item}"' for item in command))
             file.write("]\n}")
     else:
-        raise ValueError(f"Unsupported core for EEP package creation: {config['core']}")
+        raise ValueError(f"Unsupported core for EEP package creation: {config.core}")
 
     readme_path = os.path.join(eep_dir, "readme.txt")
     if not os.path.exists(readme_path):

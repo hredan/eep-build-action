@@ -7,7 +7,6 @@ if __name__ == "__main__":
     helper.download_json_files()
 
     build_config = BuildConfig()
-    config = build_config.get_config()
 
     # download and install Arduino CLI
     ARDUINO_CLI_VERSION="1.4.1"
@@ -32,10 +31,10 @@ if __name__ == "__main__":
             exit(1)
 
 
-    helper.install_core(config["core"], config["core_version"])
-    helper.install_libs(config["libs"])
+    helper.install_core(build_config.core, build_config.core_version)
+    helper.install_libs(build_config.libs)
 
-    FQBN_PARA=f"esp32:esp32:{config["board"]}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
-    build_path = f"./BIN_{config["core"]}_{config["board"]}"
-    helper.compile_sketch(config["sketch_name"], build_path, FQBN_PARA, cpu_freq=config["cpu_frequency"])
-    helper.create_eep_dir(config)
+    FQBN_PARA=f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
+    build_path = f"./BIN_{build_config.core}_{build_config.board}"
+    helper.compile_sketch(build_config.sketch_name, build_path, FQBN_PARA, cpu_freq=build_config.cpu_f)
+    helper.create_eep_dir(build_config)
