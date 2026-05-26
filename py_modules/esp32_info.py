@@ -14,7 +14,7 @@ class Esp32Info(InfoBase):
     
     def get_mcu_for_board(self, board_name):
         for board in self.boards:
-            if board["name"] == board_name:
+            if board["board"] == board_name:
                 return board["mcu"]
         return None
 
