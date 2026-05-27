@@ -1,4 +1,14 @@
+"""
+Main script for building an Arduino sketch using the configured core, board and scheme.
+
+For confiuguration you can use the information on ESP Board Overview webpage:
+https://hredan.github.io/esp-board-overview/
+
+Copyright (C) 2026 hredan
+https://github.com/hredan/eep-build-action
+"""
 import os
+import sys
 from py_modules import helper
 from py_modules.build_config import BuildConfig
 
@@ -9,8 +19,8 @@ if __name__ == "__main__":
     build_config = BuildConfig()
 
     # download and install Arduino CLI
-    ARDUINO_CLI_VERSION="1.4.1"
-    TOOL="./tools/arduino-cli"
+    ARDUINO_CLI_VERSION = "1.4.1"
+    TOOL = "./tools/arduino-cli"
     helper.download_arduino_cli(ARDUINO_CLI_VERSION)
     install_result = helper.run_bash_command(
         f"tar -xzf tools/arduino-cli_{ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz -C tools/",
@@ -18,23 +28,24 @@ if __name__ == "__main__":
     )
     if not install_result["success"]:
         print(f"Error installing Arduino CLI: {install_result['stderr']}")
-        exit(1)
+        sys.exit(1)
     if not os.path.exists(TOOL):
         print(f"Error: Arduino CLI not found at {TOOL}")
-        exit(1)
+        sys.exit(1)
     else:
         result = helper.run_bash_command(TOOL + " version", stream_output=True)
         if result["success"]:
-            print(f"✅ Arduino CLI installed successfully")
+            print("✅ Arduino CLI installed successfully")
         else:
-            print(f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
-            exit(1)
-
+            print(
+                f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
+            sys.exit(1)
 
     helper.install_core(build_config.core, build_config.core_version)
     helper.install_libs(build_config.libs)
 
-    FQBN_PARA=f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
-    build_path = f"./BIN_{build_config.core}_{build_config.board}"
-    helper.compile_sketch(build_config.sketch_name, build_path, FQBN_PARA, cpu_freq=build_config.cpu_f)
+    FQBN_PARA = f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
+    BUILD_PATH = f"./BIN_{build_config.core}_{build_config.board}"
+    helper.compile_sketch(build_config.sketch_name,
+                          BUILD_PATH, FQBN_PARA, cpu_freq=build_config.cpu_f)
     helper.create_eep_dir(build_config)

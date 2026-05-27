@@ -1,15 +1,23 @@
-import requests
+"""
+Module providing helper functions for downloading files and running subprocesses.
+
+Copyright (C) 2026 hredan
+https://github.com/hredan/eep-build-action
+"""
 import os
+import sys
 import subprocess
 import threading
 import shutil
+import requests
 
 from py_modules.build_config import BuildConfig
+
 
 def download_file(url, save_path):
     """
     Downloads a file from a URL and saves it locally.
-    
+
     :param url: URL of the file
     :param save_path: Local save path (including file name)
     """
@@ -17,18 +25,18 @@ def download_file(url, save_path):
         # Use HTTP GET with streaming to avoid loading large files fully into memory
         with requests.get(url, stream=True, timeout=15) as response:
             response.raise_for_status()  # Raise an error if the HTTP status is not 200
-            
+
             # Create the target directory if it does not exist yet
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
-            
+
             # Write the file in chunks
             with open(save_path, 'wb') as file:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:  # Ignore empty chunks
                         file.write(chunk)
-        
+
         print(f"✅ File saved successfully to: {save_path}")
-    
+
     except requests.exceptions.MissingSchema:
         print("❌ Invalid URL. Please start with http:// or https://.")
     except requests.exceptions.ConnectionError:
@@ -37,21 +45,28 @@ def download_file(url, save_path):
         print("❌ Download timed out.")
     except requests.exceptions.HTTPError as e:
         print(f"❌ HTTP error: {e}")
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         print(f"❌ Unexpected error: {e}")
 
+
 def download_json_files():
+    """Download all required ESP board JSON data files to the esp_core_info directory."""
     urls = [
-        ### core list
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/core_list.json",
-        ### esp8266
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp8266.json",
-        #### esp32
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32.json",
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_partition_schemes.json",
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/esp32_mcu_bootloader_addr.json"
+        # core list
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
+            refs/heads/main/web-app/data/core_list.json",
+        # esp8266
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
+            refs/heads/main/web-app/data/esp8266.json",
+        # esp32
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
+            refs/heads/main/web-app/data/esp32.json",
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
+            refs/heads/main/web-app/data/esp32_partition_schemes.json",
+        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
+            refs/heads/main/web-app/data/esp32_mcu_bootloader_addr.json"
     ]
-    
+
     for url in urls:
         filename = os.path.basename(url)
         save_path = os.path.join("./esp_core_info", filename)
@@ -87,7 +102,7 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
                 "stderr": result.stderr,
             }
 
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # pylint: disable=consider-using-with
             ["bash", "-lc", command],
             cwd=cwd,
             stdout=subprocess.PIPE,
@@ -100,13 +115,16 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
         stderr_lines = []
 
         def stream(pipe, collected, prefix):
+            """Read lines from a pipe and collect them, printing each with a prefix."""
             for line in iter(pipe.readline, ""):
                 collected.append(line)
                 print(f"{prefix}{line}", end="", flush=True)
             pipe.close()
 
-        stdout_thread = threading.Thread(target=stream, args=(process.stdout, stdout_lines, ""))
-        stderr_thread = threading.Thread(target=stream, args=(process.stderr, stderr_lines, ""))
+        stdout_thread = threading.Thread(
+            target=stream, args=(process.stdout, stdout_lines, ""))
+        stderr_thread = threading.Thread(
+            target=stream, args=(process.stderr, stderr_lines, ""))
         stdout_thread.start()
         stderr_thread.start()
 
@@ -132,7 +150,7 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
             "stdout": "".join(stdout_lines),
             "stderr": "".join(stderr_lines),
         }
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return {
             "success": False,
             "returncode": None,
@@ -140,41 +158,55 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
             "stderr": f"Unexpected error while running command: {e}",
         }
 
+
 def download_arduino_cli(version):
+    """Download the arduino-cli binary for the given version if not already present."""
     url = f"https://downloads.arduino.cc/arduino-cli/arduino-cli_{version}_Linux_64bit.tar.gz"
-    save_path = os.path.join("./tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
+    save_path = os.path.join(
+        "./tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
     if not os.path.exists(save_path):
         download_file(url, save_path)
 
+
 def install_libs(libs):
+    """Install a comma-separated list of Arduino libraries using arduino-cli."""
     if libs:
         for lib in libs.split(","):
             lib = lib.strip()
             if lib:
                 print(f"Installing library: {lib}")
-                result = run_bash_command(f"./tools/arduino-cli lib install {lib}", stream_output=True)
+                result = run_bash_command(
+                    f"./tools/arduino-cli lib install {lib}", stream_output=True)
                 if not result["success"]:
-                    print(f"Error installing library {lib}:\n{result['stderr']}")
-                    exit(1)
+                    print(
+                        f"Error installing library {lib}:\n{result['stderr']}")
+                    sys.exit(1)
+
 
 def install_core(core, version=None):
+    """Install the specified Arduino core with an optional version using arduino-cli."""
     if version:
         core = f"{core}:{core}@{version}"
     else:
         core = f"{core}:{core}"
     print(f"Installing core: {core} version {version}")
-    CORE_URL="https://espressif.github.io/arduino-esp32/package_esp32_index.json"
-    result = run_bash_command(f"./tools/arduino-cli core update-index --additional-urls {CORE_URL}", stream_output=True)
+    core_url = "https://espressif.github.io/arduino-esp32/package_esp32_index.json"
+    result = run_bash_command(
+        f"./tools/arduino-cli core update-index --additional-urls {core_url}", stream_output=True)
     if not result["success"]:
         print(f"Error updating core index:\n{result['stderr']}")
-        exit(1)
+        sys.exit(1)
 
-    result = run_bash_command(f"./tools/arduino-cli core install {core}", stream_output=True)
+    result = run_bash_command(
+        f"./tools/arduino-cli core install {core}", stream_output=True)
     if not result["success"]:
-        print(f"Error installing core {core} version {version}:\n{result['stderr']}")
-        exit(1)
+        print(
+            f"Error installing core {core} version {version}:\n{result['stderr']}")
+        sys.exit(1)
 
-def compile_sketch(sketch_name, build_path,fqbn, cpu_freq=None):
+
+def compile_sketch(sketch_name, build_path, fqbn, cpu_freq=None):
+    """Compile an Arduino sketch using arduino-cli with the given FQBN and optional CPU frequency."""
     command = f"./tools/arduino-cli compile --fqbn {fqbn} {sketch_name}.ino"
     if cpu_freq:
         command += f" --build-property cpu_freq={cpu_freq}"
@@ -182,15 +214,88 @@ def compile_sketch(sketch_name, build_path,fqbn, cpu_freq=None):
     result = run_bash_command(command, stream_output=True)
     if not result["success"]:
         print(f"Error compiling sketch:\n{result['stderr']}")
-        exit(1)
+        sys.exit(1)
+
+
+def _create_eep_esp8266(config: BuildConfig, eep_dir, output_name, littlefs_src, has_littlefs):
+    """Create the EEP package files for an ESP8266 build."""
+    app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
+    app_dst_name = f"{config.core}_{output_name}.ino.bin"
+    app_dst = os.path.join(eep_dir, app_dst_name)
+    shutil.copy2(app_src, app_dst)
+
+    eef_path = os.path.join(
+        eep_dir, f"{config.core}_{config.board}_{config.sketch_name}.eef")
+    command = ["--baud", "460800", "write-flash", "0x0", app_dst_name]
+
+    if has_littlefs:
+        littlefs_name = os.path.basename(littlefs_src)
+        shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
+        command.extend(["0x200000", littlefs_name])
+
+    with open(eef_path, "w", encoding="utf-8") as file:
+        file.write('{\n\t"command": [')
+        file.write(", ".join(f'"{item}"' for item in command))
+        file.write("]\n}")
+
+
+def _copy_esp32_binaries(config: BuildConfig, eep_dir, output_name):
+    """Copy ESP32 firmware binaries to the EEP directory and return their destination names."""
+    app_dst_name = f"{config.core}_{output_name}.ino.bin"
+    bootloader_dst_name = f"{config.core}_{output_name}.ino.bootloader.bin"
+    partitions_dst_name = f"{config.core}_{output_name}.ino.partitions.bin"
+
+    shutil.copy2(os.path.join(config.build_path, f"{config.sketch_name}.ino.bin"),
+                 os.path.join(eep_dir, app_dst_name))
+    shutil.copy2(os.path.join(config.build_path, f"{config.sketch_name}.ino.bootloader.bin"),
+                 os.path.join(eep_dir, bootloader_dst_name))
+    shutil.copy2(os.path.join(config.build_path, f"{config.sketch_name}.ino.partitions.bin"),
+                 os.path.join(eep_dir, partitions_dst_name))
+
+    boot_app_src = os.path.expanduser(
+        f"~/.arduino15/packages/esp32/hardware/esp32/{config.core_version}/tools/partitions/boot_app0.bin"
+    )
+    if not os.path.exists(boot_app_src):
+        raise FileNotFoundError(
+            f"Missing required file for ESP32 EEP package: {boot_app_src}")
+    shutil.copy2(boot_app_src, os.path.join(eep_dir, "boot_app0.bin"))
+
+    return app_dst_name, bootloader_dst_name, partitions_dst_name
+
+
+def _create_eep_esp32(config: BuildConfig, eep_dir, output_name, littlefs_src, has_littlefs):
+    """Create the EEP package files for an ESP32 build."""
+    app_dst_name, bootloader_dst_name, partitions_dst_name = _copy_esp32_binaries(
+        config, eep_dir, output_name)
+
+    eef_path = os.path.join(eep_dir, f"{config.core}_{output_name}.eef")
+    command = [
+        "--chip", config.get_mcu(), "--baud", "921600",
+        "--before", "default_reset", "--after", "hard_reset",
+        "write-flash", "-z", "--flash_mode", "dio", "--flash_freq", "80m", "--flash_size", "detect",
+        "0xe000", "boot_app0.bin",
+        config.get_bootloader_address(), bootloader_dst_name,
+        "0x10000", app_dst_name,
+        "0x8000", partitions_dst_name,
+    ]
+
+    if has_littlefs:
+        littlefs_name = os.path.basename(littlefs_src)
+        shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
+        command.extend(["0x290000", littlefs_name])
+
+    with open(eef_path, "w", encoding="utf-8") as file:
+        file.write('{\n\t"command": [')
+        file.write(", ".join(f'"{item}"' for item in command))
+        file.write("]\n}")
 
 
 def create_eep_dir(config: BuildConfig):
-    eep_dir="./EEP"
-    bin_data_dir="./BIN_DATA"
+    """Create the EEP package directory with firmware binaries and an .eef flash command file."""
+    eep_dir = "./EEP"
+    bin_data_dir = "./BIN_DATA"
     os.makedirs(eep_dir, exist_ok=True)
 
-    # Keep folder, but clear old package files before copying new artifacts.
     for entry in os.listdir(eep_dir):
         entry_path = os.path.join(eep_dir, entry)
         if os.path.isdir(entry_path):
@@ -204,89 +309,18 @@ def create_eep_dir(config: BuildConfig):
     has_littlefs = os.path.exists(littlefs_src)
 
     if config.core == "esp8266":
-        app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
-        app_dst_name = f"{config.core}_{output_name}.ino.bin"
-        app_dst = os.path.join(eep_dir, app_dst_name)
-        shutil.copy2(app_src, app_dst)
-
-        eef_path = os.path.join(eep_dir, f"{config.core}_{config.board}_{config.sketch_name}.eef")
-        command = [
-            "--baud",
-            "460800",
-            "write-flash",
-            "0x0",
-            app_dst_name,
-        ]
-
-        if has_littlefs:
-            shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
-            command.extend(["0x200000", littlefs_name])
-
-        with open(eef_path, "w", encoding="utf-8") as file:
-            file.write('{\n\t"command": [')
-            file.write(", ".join(f'"{item}"' for item in command))
-            file.write("]\n}")
-
+        _create_eep_esp8266(config, eep_dir, output_name,
+                            littlefs_src, has_littlefs)
     elif config.core == "esp32":
-        app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
-        bootloader_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bootloader.bin")
-        partitions_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.partitions.bin")
-
-        app_dst_name = f"{config.core}_{output_name}.ino.bin"
-        bootloader_dst_name = f"{config.core}_{output_name}.ino.bootloader.bin"
-        partitions_dst_name = f"{config.core}_{output_name}.ino.partitions.bin"
-
-        shutil.copy2(app_src, os.path.join(eep_dir, app_dst_name))
-        shutil.copy2(bootloader_src, os.path.join(eep_dir, bootloader_dst_name))
-        shutil.copy2(partitions_src, os.path.join(eep_dir, partitions_dst_name))
-
-        BOOT_APP_PATH=f"~/.arduino15/packages/esp32/hardware/esp32/{config.core_version}/tools/partitions/boot_app0.bin"
-        boot_app_src = os.path.expanduser(BOOT_APP_PATH)
-        if not os.path.exists(boot_app_src):
-            raise FileNotFoundError(f"Missing required file for ESP32 EEP package: {boot_app_src}")
-        shutil.copy2(boot_app_src, os.path.join(eep_dir, "boot_app0.bin"))
-
-
-        eef_path = os.path.join(eep_dir, f"{config.core}_{output_name}.eef")
-        command = [
-            "--chip",
-            config.get_mcu(),
-            "--baud",
-            "921600",
-            "--before",
-            "default_reset",
-            "--after",
-            "hard_reset",
-            "write-flash",
-            "-z",
-            "--flash_mode",
-            "dio",
-            "--flash_freq",
-            "80m",
-            "--flash_size",
-            "detect",
-            "0xe000",
-            "boot_app0.bin",
-            config.get_bootloader_address(),
-            bootloader_dst_name,
-            "0x10000",
-            app_dst_name,
-            "0x8000",
-            partitions_dst_name,
-        ]
-
-        if has_littlefs:
-            shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
-            command.extend(["0x290000", littlefs_name])
-
-        with open(eef_path, "w", encoding="utf-8") as file:
-            file.write('{\n\t"command": [')
-            file.write(", ".join(f'"{item}"' for item in command))
-            file.write("]\n}")
+        _create_eep_esp32(config, eep_dir, output_name,
+                          littlefs_src, has_littlefs)
     else:
-        raise ValueError(f"Unsupported core for EEP package creation: {config.core}")
+        raise ValueError(
+            f"Unsupported core for EEP package creation: {config.core}")
 
     readme_path = os.path.join(eep_dir, "readme.txt")
     if not os.path.exists(readme_path):
         with open(readme_path, "w", encoding="utf-8") as file:
-            file.write("This package can be used with ESPEasyFlasher2.0 (https://github.com/hredan/ESPEASYFLASHER_2.0)\n")
+            file.write(
+                "This package can be used with ESPEasyFlasher2.0 "
+                "(https://github.com/hredan/ESPEASYFLASHER_2.0)\n")

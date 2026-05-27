@@ -1,9 +1,17 @@
+"""
+Module for managing build configuration based on environment variables.
+
+Copyright (C) 2026 hredan
+https://github.com/hredan/eep-build-action
+"""
 import os
 from py_modules.core_list import CoreList
 from py_modules.esp32_info import Esp32Info
-from py_modules.esp8266_info import Esp8266Info
 
-class BuildConfig:
+
+class BuildConfig:  # pylint: disable=too-many-instance-attributes
+    """Holds the build configuration derived from environment variables."""
+
     def __init__(self):
         self.core = os.environ.get("INPUT_CORE")
         self.board = os.environ.get("INPUT_BOARD")
@@ -20,10 +28,12 @@ class BuildConfig:
         if not core_version:
             raise ValueError(f"Core '{self.core}' not found in core list.")
         return core_version
-    
+
     def get_mcu(self):
+        """Return the MCU identifier for the configured board."""
         return self.__esp32_info.get_mcu_for_board(self.board)
-    
+
     def get_bootloader_address(self):
+        """Return the bootloader flash address for the configured board's MCU."""
         mcu = self.get_mcu()
         return self.__esp32_info.get_bootloader_address_for_mcu(mcu)
