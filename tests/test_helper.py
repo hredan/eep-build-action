@@ -511,9 +511,9 @@ def test_create_eep_dir_esp32(tmp_path: Any, monkeypatch: Any) -> None:
     boot_app_path = tmp_path / "boot_app0.bin"
     boot_app_path.write_bytes(b"boot_app0")
 
-    def exists_side_effect(path: str) -> bool:
+    def exists_side_effect(path: object) -> bool:
         """Return True for boot_app0.bin, False for littlefs."""
-        if "boot_app0.bin" in path:
+        if "boot_app0.bin" in str(path):
             return True
         return False
 
