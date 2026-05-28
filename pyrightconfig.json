@@ -1,0 +1,15 @@
+{
+  "include": [
+    "py_modules",
+    "tests",
+    "build_sketch.py"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".venv",
+    "tools"
+  ],
+  "typeCheckingMode": "strict",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false
+}

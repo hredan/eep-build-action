@@ -6,6 +6,7 @@ https://github.com/hredan/eep-build-action
 """
 import sys
 
+
 from py_modules.info_base import InfoBase, CORE_DATA_DIR
 
 
@@ -19,7 +20,7 @@ class CoreList(InfoBase):
             print(f"Error initializing CoreList: {e}")
             sys.exit(1)
 
-    def get_core_version(self, core_name):
+    def get_core_version(self, core_name: str) -> str | None:
         """Return the latest version string for the given core name, or None if not found."""
         for core in self.cores:
             if core["core_name"] == core_name:

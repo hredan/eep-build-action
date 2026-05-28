@@ -4,6 +4,8 @@ Module for providing ESP32 board information including MCU and partition data.
 Copyright (C) 2026 hredan
 https://github.com/hredan/eep-build-action
 """
+
+
 from py_modules.info_base import InfoBase, CORE_DATA_DIR
 
 
@@ -20,13 +22,13 @@ class Esp32Info(InfoBase):
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error initializing Esp32Info: {e}")
 
-    def get_mcu_for_board(self, board_name):
+    def get_mcu_for_board(self, board_name: str) -> str | None:
         """Return the MCU identifier for the given board name, or None if not found."""
         for board in self.boards:
             if board["board"] == board_name:
                 return board["mcu"]
         return None
 
-    def get_bootloader_address_for_mcu(self, mcu):
+    def get_bootloader_address_for_mcu(self, mcu: str) -> str | None:
         """Return the bootloader flash address for the given MCU, or None if not found."""
-        return self.bootloader_addresses.get(mcu, None)
+        return self.bootloader_addresses.get(mcu, None)  # type: ignore[union-attr]

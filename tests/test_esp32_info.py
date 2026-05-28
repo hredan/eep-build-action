@@ -5,16 +5,17 @@ Copyright (C) 2026 hredan
 https://github.com/hredan/eep-build-action
 """
 import json
+from typing import Any
 
 from py_modules import esp32_info
 
 
-def write_json(path, data):
+def write_json(path: Any, data: Any) -> None:
     """Write data as JSON to the given path."""
     path.write_text(json.dumps(data), encoding="utf-8")
 
 
-def test_esp32_info_loads_board_and_bootloader_data(tmp_path, monkeypatch):
+def test_esp32_info_loads_board_and_bootloader_data(tmp_path: Any, monkeypatch: Any) -> None:
     """Test that Esp32Info correctly loads board and bootloader address data."""
     core_data_dir = tmp_path / "esp_core_info"
     core_data_dir.mkdir()
@@ -55,7 +56,7 @@ def test_esp32_info_loads_board_and_bootloader_data(tmp_path, monkeypatch):
     assert info.get_bootloader_address_for_mcu("esp32s3") == "0x0"
 
 
-def test_esp32_info_returns_none_for_unknown_entries(tmp_path, monkeypatch):
+def test_esp32_info_returns_none_for_unknown_entries(tmp_path: Any, monkeypatch: Any) -> None:
     """Test that Esp32Info returns None for unknown board and MCU entries."""
     core_data_dir = tmp_path / "esp_core_info"
     core_data_dir.mkdir()

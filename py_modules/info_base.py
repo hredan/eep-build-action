@@ -6,6 +6,8 @@ https://github.com/hredan/eep-build-action
 """
 import sys
 import json
+from typing import Any
+
 CORE_DATA_DIR = "esp_core_info"
 
 
@@ -15,7 +17,7 @@ class InfoBase:  # pylint: disable=too-few-public-methods
     def __init__(self):
         pass
 
-    def load_json(self, file_path):
+    def load_json(self, file_path: str) -> Any:
         """Load and return parsed JSON data from the given file path."""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:

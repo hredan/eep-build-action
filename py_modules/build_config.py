@@ -22,18 +22,19 @@ class BuildConfig:  # pylint: disable=too-many-instance-attributes
         self.core_version = self.__get_core_version()
         self.__esp32_info = Esp32Info()
 
-    def __get_core_version(self):
+    def __get_core_version(self) -> str:
         core_list = CoreList()
-        core_version = core_list.get_core_version(self.core)
+        core_version = core_list.get_core_version(
+            self.core) if self.core else None
         if not core_version:
             raise ValueError(f"Core '{self.core}' not found in core list.")
         return core_version
 
-    def get_mcu(self):
+    def get_mcu(self) -> str | None:
         """Return the MCU identifier for the configured board."""
-        return self.__esp32_info.get_mcu_for_board(self.board)
+        return self.__esp32_info.get_mcu_for_board(self.board) if self.board else None
 
-    def get_bootloader_address(self):
+    def get_bootloader_address(self) -> str | None:
         """Return the bootloader flash address for the configured board's MCU."""
         mcu = self.get_mcu()
-        return self.__esp32_info.get_bootloader_address_for_mcu(mcu)
+        return self.__esp32_info.get_bootloader_address_for_mcu(mcu) if mcu else None

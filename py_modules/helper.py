@@ -9,12 +9,14 @@ import sys
 import subprocess
 import threading
 import shutil
+from typing import IO
+
 import requests
 
 from py_modules.build_config import BuildConfig
 
 
-def download_file(url, save_path):
+def download_file(url: str, save_path: str) -> None:
     """
     Downloads a file from a URL and saves it locally.
 
@@ -49,7 +51,7 @@ def download_file(url, save_path):
         print(f"❌ Unexpected error: {e}")
 
 
-def download_json_files():
+def download_json_files() -> None:
     """Download all required ESP board JSON data files to the esp_core_info directory."""
     urls = [
         # core list
@@ -74,7 +76,7 @@ def download_json_files():
             download_file(url, save_path)
 
 
-def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
+def run_bash_command(command: str, cwd: str | None = None, timeout: int = 120, stream_output: bool = False) -> dict[str, bool | int | str | None]:
     """
     Runs a command in bash and returns a structured result.
 
@@ -111,10 +113,10 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
             bufsize=1,
         )
 
-        stdout_lines = []
-        stderr_lines = []
+        stdout_lines: list[str] = []
+        stderr_lines: list[str] = []
 
-        def stream(pipe, collected, prefix):
+        def stream(pipe: IO[str], collected: list[str], prefix: str) -> None:
             """Read lines from a pipe and collect them, printing each with a prefix."""
             for line in iter(pipe.readline, ""):
                 collected.append(line)
@@ -122,8 +124,10 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
             pipe.close()
 
         stdout_thread = threading.Thread(
+            # type: ignore[arg-type]
             target=stream, args=(process.stdout, stdout_lines, ""))
         stderr_thread = threading.Thread(
+            # type: ignore[arg-type]
             target=stream, args=(process.stderr, stderr_lines, ""))
         stdout_thread.start()
         stderr_thread.start()
@@ -159,7 +163,7 @@ def run_bash_command(command, cwd=None, timeout=120, stream_output=False):
         }
 
 
-def download_arduino_cli(version):
+def download_arduino_cli(version: str) -> None:
     """Download the arduino-cli binary for the given version if not already present."""
     url = f"https://downloads.arduino.cc/arduino-cli/arduino-cli_{version}_Linux_64bit.tar.gz"
     save_path = os.path.join(
@@ -168,7 +172,7 @@ def download_arduino_cli(version):
         download_file(url, save_path)
 
 
-def install_libs(libs):
+def install_libs(libs: str | None) -> None:
     """Install a comma-separated list of Arduino libraries using arduino-cli."""
     if libs:
         for lib in libs.split(","):
@@ -183,7 +187,7 @@ def install_libs(libs):
                     sys.exit(1)
 
 
-def install_core(core, version=None):
+def install_core(core: str, version: str | None = None) -> None:
     """Install the specified Arduino core with an optional version using arduino-cli."""
     if version:
         core = f"{core}:{core}@{version}"
@@ -205,7 +209,7 @@ def install_core(core, version=None):
         sys.exit(1)
 
 
-def compile_sketch(sketch_name, build_path, fqbn, cpu_freq=None):
+def compile_sketch(sketch_name: str, build_path: str, fqbn: str, cpu_freq: str | None = None) -> None:
     """Compile an Arduino sketch using arduino-cli with the given FQBN and optional CPU frequency."""
     command = f"./tools/arduino-cli compile --fqbn {fqbn} {sketch_name}.ino"
     if cpu_freq:
@@ -217,7 +221,7 @@ def compile_sketch(sketch_name, build_path, fqbn, cpu_freq=None):
         sys.exit(1)
 
 
-def _create_eep_esp8266(config: BuildConfig, eep_dir, output_name, littlefs_src, has_littlefs):
+def _create_eep_esp8266(config: BuildConfig, eep_dir: str, output_name: str, littlefs_src: str, has_littlefs: bool) -> None:
     """Create the EEP package files for an ESP8266 build."""
     app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
     app_dst_name = f"{config.core}_{output_name}.ino.bin"
@@ -235,11 +239,12 @@ def _create_eep_esp8266(config: BuildConfig, eep_dir, output_name, littlefs_src,
 
     with open(eef_path, "w", encoding="utf-8") as file:
         file.write('{\n\t"command": [')
+        # type: ignore[arg-type]
         file.write(", ".join(f'"{item}"' for item in command))
         file.write("]\n}")
 
 
-def _copy_esp32_binaries(config: BuildConfig, eep_dir, output_name):
+def _copy_esp32_binaries(config: BuildConfig, eep_dir: str, output_name: str) -> tuple[str, str, str]:
     """Copy ESP32 firmware binaries to the EEP directory and return their destination names."""
     app_dst_name = f"{config.core}_{output_name}.ino.bin"
     bootloader_dst_name = f"{config.core}_{output_name}.ino.bootloader.bin"
@@ -263,7 +268,7 @@ def _copy_esp32_binaries(config: BuildConfig, eep_dir, output_name):
     return app_dst_name, bootloader_dst_name, partitions_dst_name
 
 
-def _create_eep_esp32(config: BuildConfig, eep_dir, output_name, littlefs_src, has_littlefs):
+def _create_eep_esp32(config: BuildConfig, eep_dir: str, output_name: str, littlefs_src: str, has_littlefs: bool) -> None:
     """Create the EEP package files for an ESP32 build."""
     app_dst_name, bootloader_dst_name, partitions_dst_name = _copy_esp32_binaries(
         config, eep_dir, output_name)
@@ -286,11 +291,12 @@ def _create_eep_esp32(config: BuildConfig, eep_dir, output_name, littlefs_src, h
 
     with open(eef_path, "w", encoding="utf-8") as file:
         file.write('{\n\t"command": [')
+        # type: ignore[arg-type]
         file.write(", ".join(f'"{item}"' for item in command))
         file.write("]\n}")
 
 
-def create_eep_dir(config: BuildConfig):
+def create_eep_dir(config: BuildConfig) -> None:
     """Create the EEP package directory with firmware binaries and an .eef flash command file."""
     eep_dir = "./EEP"
     bin_data_dir = "./BIN_DATA"

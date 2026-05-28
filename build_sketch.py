@@ -41,11 +41,11 @@ if __name__ == "__main__":
                 f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
             sys.exit(1)
 
-    helper.install_core(build_config.core, build_config.core_version)
-    helper.install_libs(build_config.libs)
+    helper.install_core(build_config.core or "", build_config.core_version)
+    helper.install_libs(build_config.libs or "")
 
     FQBN_PARA = f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
     BUILD_PATH = f"./BIN_{build_config.core}_{build_config.board}"
-    helper.compile_sketch(build_config.sketch_name,
+    helper.compile_sketch(build_config.sketch_name or "",
                           BUILD_PATH, FQBN_PARA, cpu_freq=build_config.cpu_f)
     helper.create_eep_dir(build_config)
