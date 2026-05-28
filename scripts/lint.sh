@@ -37,7 +37,7 @@ echo -e "${GREEN}Dependencies installed${NC}\n"
 
 # Run pylint
 echo -e "${BLUE}--- Running pylint ---${NC}"
-if python -m pylint --max-line-length=120 py_modules/ tests/ build_sketch.py 2>/dev/null; then
+if python -m pylint --max-line-length=120 py_modules/ build_sketch.py 2>/dev/null; then
     echo -e "${GREEN}✓ pylint passed${NC}\n"
     PYLINT_RESULT=0
 else

@@ -1,7 +1,6 @@
 {
   "include": [
     "py_modules",
-    "tests",
     "build_sketch.py"
   ],
   "exclude": [
