@@ -76,7 +76,12 @@ def download_json_files() -> None:
             download_file(url, save_path)
 
 
-def run_bash_command(command: str, cwd: str | None = None, timeout: int = 120, stream_output: bool = False) -> dict[str, bool | int | str | None]:
+def run_bash_command(
+    command: str,
+    cwd: str | None = None,
+    timeout: int = 120,
+    stream_output: bool = False,
+) -> dict[str, bool | int | str | None]:
     """
     Runs a command in bash and returns a structured result.
 
@@ -221,7 +226,13 @@ def compile_sketch(sketch_name: str, build_path: str, fqbn: str, cpu_freq: str |
         sys.exit(1)
 
 
-def _create_eep_esp8266(config: BuildConfig, eep_dir: str, output_name: str, littlefs_src: str, has_littlefs: bool) -> None:
+def _create_eep_esp8266(
+    config: BuildConfig,
+    eep_dir: str,
+    output_name: str,
+    littlefs_src: str,
+    has_littlefs: bool,
+) -> None:
     """Create the EEP package files for an ESP8266 build."""
     app_src = os.path.join(config.build_path, f"{config.sketch_name}.ino.bin")
     app_dst_name = f"{config.core}_{output_name}.ino.bin"
@@ -268,7 +279,13 @@ def _copy_esp32_binaries(config: BuildConfig, eep_dir: str, output_name: str) ->
     return app_dst_name, bootloader_dst_name, partitions_dst_name
 
 
-def _create_eep_esp32(config: BuildConfig, eep_dir: str, output_name: str, littlefs_src: str, has_littlefs: bool) -> None:
+def _create_eep_esp32(
+    config: BuildConfig,
+    eep_dir: str,
+    output_name: str,
+    littlefs_src: str,
+    has_littlefs: bool,
+) -> None:
     """Create the EEP package files for an ESP32 build."""
     app_dst_name, bootloader_dst_name, partitions_dst_name = _copy_esp32_binaries(
         config, eep_dir, output_name)
