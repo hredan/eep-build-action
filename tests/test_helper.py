@@ -511,21 +511,14 @@ def test_create_eep_dir_esp32(tmp_path: Any, monkeypatch: Any) -> None:
     boot_app_path = tmp_path / "boot_app0.bin"
     boot_app_path.write_bytes(b"boot_app0")
 
-    def exists_side_effect(path: object) -> bool:
-        """Return True for boot_app0.bin, False for littlefs."""
-        if "boot_app0.bin" in str(path):
-            return True
-        return False
-
     with patch("os.path.expanduser", return_value=str(boot_app_path)):
-        with patch("os.path.exists", side_effect=exists_side_effect):
-            with patch("shutil.copy2"):  # Mock file copying
-                helper.create_eep_dir(config)
+        with patch("shutil.copy2"):  # Mock file copying
+            helper.create_eep_dir(config)
 
-                # Verify EEP directory was created
-                assert (tmp_path / "EEP").exists()
-                # Verify readme.txt was created
-                assert (tmp_path / "EEP" / "readme.txt").exists()
+            # Verify EEP directory was created
+            assert (tmp_path / "EEP").exists()
+            # Verify readme.txt was created
+            assert (tmp_path / "EEP" / "readme.txt").exists()
 
 
 def test_create_eep_dir_unsupported_core(tmp_path: Any, monkeypatch: Any) -> None:
