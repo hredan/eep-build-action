@@ -53,20 +53,16 @@ def download_file(url: str, save_path: str) -> None:
 
 def download_json_files() -> None:
     """Download all required ESP board JSON data files to the esp_core_info directory."""
+    web_base_url = "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/"
     urls = [
         # core list
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
-            refs/heads/main/web-app/data/core_list.json",
+        web_base_url + "core_list.json",
         # esp8266
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
-            refs/heads/main/web-app/data/esp8266.json",
+        web_base_url + "esp8266.json",
         # esp32
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
-            refs/heads/main/web-app/data/esp32.json",
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
-            refs/heads/main/web-app/data/esp32_partition_schemes.json",
-        "https://raw.githubusercontent.com/hredan/esp-board-overview/\
-            refs/heads/main/web-app/data/esp32_mcu_bootloader_addr.json"
+        web_base_url + "esp32.json",
+        web_base_url + "esp32_partition_schemes.json",
+        web_base_url + "esp32_mcu_bootloader_addr.json"
     ]
 
     for url in urls:
@@ -241,7 +237,8 @@ def _create_eep_esp8266(
 
     eef_path = os.path.join(
         eep_dir, f"{config.core}_{config.board}_{config.sketch_name}.eef")
-    command = ["--baud", "460800", "write-flash", "0x0", app_dst_name]
+    command = ["--chip", "esp8266", "--baud",
+               "460800", "write-flash", "0x0", app_dst_name]
 
     if has_littlefs:
         littlefs_name = os.path.basename(littlefs_src)

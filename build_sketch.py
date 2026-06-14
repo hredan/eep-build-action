@@ -44,8 +44,11 @@ if __name__ == "__main__":
     helper.install_core(build_config.core or "", build_config.core_version)
     helper.install_libs(build_config.libs or "")
 
-    FQBN_PARA = f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,UploadSpeed=921600"
+    if build_config.core == "esp32":
+        fqbn_para = f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme=default,CPUFreq={build_config.cpu_f},UploadSpeed=921600"
+    else:
+        fqbn_para = f"esp8266:esp8266:{build_config.board}:xtal={build_config.cpu_f},vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,ip=hb2f,dbg=Disabled,lvl=None____,wipe=none,baud=921600"
     BUILD_PATH = f"./BIN_{build_config.core}_{build_config.board}"
     helper.compile_sketch(build_config.sketch_name or "",
-                          BUILD_PATH, FQBN_PARA, cpu_freq=build_config.cpu_f)
+                          BUILD_PATH, fqbn_para, cpu_freq=build_config.cpu_f)
     helper.create_eep_dir(build_config)
