@@ -195,15 +195,18 @@ def install_core(core: str, version: str | None = None) -> None:
     else:
         core = f"{core}:{core}"
     print(f"Installing core: {core} version {version}")
-    core_url = "https://espressif.github.io/arduino-esp32/package_esp32_index.json"
-    result = run_bash_command(
-        f"./tools/arduino-cli core update-index --additional-urls {core_url}", stream_output=True)
-    if not result["success"]:
-        print(f"Error updating core index:\n{result['stderr']}")
-        sys.exit(1)
+    if core == "esp32":
+        core_url = "https://espressif.github.io/arduino-esp32/package_esp32_index.json"
+    else:
+        core_url = "https://arduino.esp8266.com/stable/package_esp8266com_index.json"
+    # result = run_bash_command(
+    #     f"./tools/arduino-cli core update-index --additional-urls {core_url}", stream_output=True)
+    # if not result["success"]:
+    #     print(f"Error updating core index:\n{result['stderr']}")
+    #     sys.exit(1)
 
     result = run_bash_command(
-        f"./tools/arduino-cli core install {core}", stream_output=True)
+        f"./tools/arduino-cli core install {core} --additional-urls {core_url}", stream_output=True)
     if not result["success"]:
         print(
             f"Error installing core {core} version {version}:\n{result['stderr']}")
