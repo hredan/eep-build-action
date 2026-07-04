@@ -2,3 +2,4 @@ __pycache__
 esp_core_info
 .coverage
 tools
+.venv

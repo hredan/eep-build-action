@@ -185,8 +185,8 @@ def test_install_core_with_version() -> None:
 
         helper.install_core("esp32", "3.0.0")
 
-        # Should be called at least twice (update-index and install)
-        assert mock_run.call_count >= 2
+        # Should be called at least once (install)
+        assert mock_run.call_count >= 1
         # Check that the core specification includes version
         install_call = [
             call for call in mock_run.call_args_list if "install" in str(call)][0]
@@ -200,7 +200,7 @@ def test_install_core_without_version() -> None:
 
         helper.install_core("esp32")
 
-        assert mock_run.call_count >= 2
+        assert mock_run.call_count >= 1
 
 
 def test_install_core_failure_exits() -> None:
@@ -293,26 +293,41 @@ def test_download_file_http_error() -> None:
                 "http://example.com/missing.txt", "/tmp/file.txt")
             mock_print.assert_called()
 
-
-def test_download_json_files() -> None:
+def test_download_json_files_core_esp32() -> None:
     """Test that download_json_files calls download_file for each required file."""
+    os.environ["INPUT_CORE"] = "esp32"  # Set core to esp32 for this test
     with patch.object(helper, "download_file") as mock_download:
         with patch("os.path.exists", return_value=False):
             helper.download_json_files()
 
             # Should be called for each JSON file (5 files)
-            assert mock_download.call_count == 5
+            assert mock_download.call_count == 4
             # Verify it's called with expected file patterns
             call_args_list = [call[0][0]
                               for call in mock_download.call_args_list]
             assert any("core_list.json" in arg for arg in call_args_list)
-            assert any("esp8266.json" in arg for arg in call_args_list)
             assert any("esp32.json" in arg for arg in call_args_list)
             assert any(
                 "esp32_partition_schemes.json" in arg for arg in call_args_list)
             assert any(
                 "esp32_mcu_bootloader_addr.json" in arg for arg in call_args_list)
 
+def test_download_json_files_core_esp8266() -> None:
+    """Test that download_json_files calls download_file for each required file."""
+    os.environ["INPUT_CORE"] = "esp8266"  # Set core to esp8266 for this test
+    with patch.object(helper, "download_file") as mock_download:
+        with patch("os.path.exists", return_value=False):
+            helper.download_json_files()
+
+            # Should be called for each JSON file (5 files)
+            assert mock_download.call_count == 3
+            # Verify it's called with expected file patterns
+            call_args_list = [call[0][0]
+                              for call in mock_download.call_args_list]
+            assert any("core_list.json" in arg for arg in call_args_list)
+            assert any("esp8266.json" in arg for arg in call_args_list)
+            assert any(
+                "esp8266_partition_schemes.json" in arg for arg in call_args_list)
 
 def test_download_json_files_skip_existing() -> None:
     """Test that download_json_files skips files that already exist."""
