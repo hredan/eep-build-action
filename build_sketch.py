@@ -14,10 +14,11 @@ from py_modules.build_config import BuildConfig
 
 if __name__ == "__main__":
     print("Current Directory:", os.getcwd())
+    
     helper.download_json_files()
 
     build_config = BuildConfig()
-
+    
     # download and install Arduino CLI
     ARDUINO_CLI_VERSION = "1.4.1"
     TOOL = "./tools/arduino-cli"

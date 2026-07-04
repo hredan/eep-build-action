@@ -56,14 +56,19 @@ def download_json_files() -> None:
     web_base_url = "https://raw.githubusercontent.com/hredan/esp-board-overview/refs/heads/main/web-app/data/"
     urls = [
         # core list
-        web_base_url + "core_list.json",
-        # esp8266
-        web_base_url + "esp8266.json",
-        # esp32
-        web_base_url + "esp32.json",
-        web_base_url + "esp32_partition_schemes.json",
-        web_base_url + "esp32_mcu_bootloader_addr.json"
+        web_base_url + "core_list.json"
     ]
+
+    core = os.environ.get("INPUT_CORE")
+
+    if core == "esp8266":
+        urls.append(web_base_url + "esp8266.json")
+        urls.append(web_base_url + "esp8266_partition_schemes.json")
+
+    if core == "esp32":
+        urls.append(web_base_url + "esp32.json")
+        urls.append(web_base_url + "esp32_partition_schemes.json")
+        urls.append(web_base_url + "esp32_mcu_bootloader_addr.json")
 
     for url in urls:
         filename = os.path.basename(url)
