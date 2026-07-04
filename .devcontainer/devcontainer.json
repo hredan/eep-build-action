@@ -24,7 +24,8 @@
 				"mhutchie.git-graph",
 				"actboy168.tasks",
 				"ms-python.python",
-				"ms-python.pylint"
+				"ms-python.pylint",
+				"ms-python.autopep8"
 			]
 		}
 	},
