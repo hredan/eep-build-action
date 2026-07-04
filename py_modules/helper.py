@@ -15,6 +15,8 @@ import requests
 
 from py_modules.build_config import BuildConfig
 
+ARDUINO_CLI_TOOL = "./tools/arduino-cli"
+
 
 def download_file(url: str, save_path: str) -> None:
     """
@@ -169,13 +171,35 @@ def run_bash_command(
         }
 
 
+def unpack_tar_gz(archive_path: str, tool_name: str) -> None:
+    """Unpack a .tar.gz archive to the specified directory."""
+    if not os.path.exists(archive_path):
+        print(f"❌ Archive not found: {archive_path}")
+        sys.exit(1)
+
+    unpack_result = run_bash_command(
+        f"tar -xzf {archive_path} -C tools/",
+        stream_output=True,
+    )
+    if not unpack_result["success"]:
+        print(
+            f"Error unpacking archive {archive_path}:\n {unpack_result['stderr']}")
+        sys.exit(1)
+    if not os.path.exists(tool_name):
+        print(f"Error: tool not found at {tool_name}")
+        sys.exit(1)
+    else:
+        print(f"✅ {tool_name} unpacked successfully")
+
+
 def download_arduino_cli(version: str) -> None:
     """Download the arduino-cli binary for the given version if not already present."""
-    url = f"https://downloads.arduino.cc/arduino-cli/arduino-cli_{version}_Linux_64bit.tar.gz"
-    save_path = os.path.join(
-        "./tools", f"arduino-cli_{version}_Linux_64bit.tar.gz")
+    archive_name = f"arduino-cli_{version}_Linux_64bit.tar.gz"
+    save_path = os.path.join("./tools", archive_name)
+    url = f"https://downloads.arduino.cc/arduino-cli/{archive_name}"
     if not os.path.exists(save_path):
         download_file(url, save_path)
+        unpack_tar_gz(save_path, ARDUINO_CLI_TOOL)
 
 
 def install_libs(libs: str | None) -> None:
@@ -205,13 +229,13 @@ def install_core(core: str, version: str | None = None) -> None:
     else:
         core_url = "https://arduino.esp8266.com/stable/package_esp8266com_index.json"
     # result = run_bash_command(
-    #     f"./tools/arduino-cli core update-index --additional-urls {core_url}", stream_output=True)
+    #     f"{ARDUINO_CLI_TOOL} core update-index --additional-urls {core_url}", stream_output=True)
     # if not result["success"]:
     #     print(f"Error updating core index:\n{result['stderr']}")
     #     sys.exit(1)
 
     result = run_bash_command(
-        f"./tools/arduino-cli core install {core} --additional-urls {core_url}", stream_output=True)
+        f"{ARDUINO_CLI_TOOL} core install {core} --additional-urls {core_url}", stream_output=True)
     if not result["success"]:
         print(
             f"Error installing core {core} version {version}:\n{result['stderr']}")
@@ -220,7 +244,7 @@ def install_core(core: str, version: str | None = None) -> None:
 
 def compile_sketch(sketch_name: str, build_path: str, fqbn: str, cpu_freq: str | None = None) -> None:
     """Compile an Arduino sketch using arduino-cli with the given FQBN and optional CPU frequency."""
-    command = f"./tools/arduino-cli compile --fqbn {fqbn} {sketch_name}.ino"
+    command = f"{ARDUINO_CLI_TOOL} compile --fqbn {fqbn} {sketch_name}.ino"
     if cpu_freq:
         command += f" --build-property cpu_freq={cpu_freq}"
     command += f" --build-path {build_path}"

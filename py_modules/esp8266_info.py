@@ -57,8 +57,8 @@ class Esp8266Info(InfoBase):
         spiffs_partition = self._get_spiffs_partition(partitions)
         return spiffs_partition.get("offset")
 
-    def get_spiffs_size(self, scheme_name: str) -> str | None:
+    def get_spiffs_size(self, scheme_name: str) -> str:
         """Return the SPIFFS size for the given partition scheme name, or None if not found."""
         partitions = self._get_partition_scheme(scheme_name)
         spiffs_partition = self._get_spiffs_partition(partitions)
-        return spiffs_partition.get("size")
+        return spiffs_partition.get("size", "")

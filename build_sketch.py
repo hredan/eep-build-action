@@ -8,8 +8,10 @@ Copyright (C) 2026 hredan
 https://github.com/hredan/eep-build-action
 """
 import os
-import sys
 from py_modules import helper
+from py_modules import build_data
+from py_modules.esp32_info import Esp32Info
+from py_modules.esp8266_info import Esp8266Info
 from py_modules.build_config import BuildConfig
 
 if __name__ == "__main__":
@@ -21,26 +23,7 @@ if __name__ == "__main__":
 
     # download and install Arduino CLI
     ARDUINO_CLI_VERSION = "1.4.1"
-    TOOL = "./tools/arduino-cli"
     helper.download_arduino_cli(ARDUINO_CLI_VERSION)
-    install_result = helper.run_bash_command(
-        f"tar -xzf tools/arduino-cli_{ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz -C tools/",
-        stream_output=True,
-    )
-    if not install_result["success"]:
-        print(f"Error installing Arduino CLI: {install_result['stderr']}")
-        sys.exit(1)
-    if not os.path.exists(TOOL):
-        print(f"Error: Arduino CLI not found at {TOOL}")
-        sys.exit(1)
-    else:
-        result = helper.run_bash_command(TOOL + " version", stream_output=True)
-        if result["success"]:
-            print("✅ Arduino CLI installed successfully")
-        else:
-            print(
-                f"❌ Error verifying Arduino CLI installation:\n{result['stderr']}")
-            sys.exit(1)
 
     helper.install_core(build_config.core or "", build_config.core_version)
     helper.install_libs(build_config.libs or "")
@@ -54,6 +37,17 @@ if __name__ == "__main__":
             ",vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M," + \
             "ip=hb2f,dbg=Disabled,lvl=None____,wipe=none,baud=921600"
     BUILD_PATH = f"./BIN_{build_config.core}_{build_config.board}"
+    print(
+        f"Building sketch: {build_config.sketch_name} " +
+        f"for board: {build_config.board} with core: {build_config.core}"
+    )
     helper.compile_sketch(build_config.sketch_name or "",
                           BUILD_PATH, fqbn_para, cpu_freq=build_config.cpu_f)
+    if os.path.exists("data"):
+        print("Building data partition...")
+        core = build_config.core
+        if core == "esp8266":
+            esp8266_info = Esp8266Info()
+            spiffs_size = esp8266_info.get_spiffs_size(build_config.flash)
+            build_data.build_data(build_config.core, spiffs_size)
     helper.create_eep_dir(build_config)
