@@ -34,7 +34,7 @@ if __name__ == "__main__":
             f",CPUFreq={build_config.cpu_f},UploadSpeed=921600"
     else:
         fqbn_para = f"esp8266:esp8266:{build_config.board}:xtal={build_config.cpu_f}" + \
-            ",vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M," + \
+            f",vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz={build_config.flash}," + \
             "ip=hb2f,dbg=Disabled,lvl=None____,wipe=none,baud=921600"
     BUILD_PATH = f"./BIN_{build_config.core}_{build_config.board}"
     print(

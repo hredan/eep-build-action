@@ -10,9 +10,8 @@ import subprocess
 import threading
 import shutil
 from typing import IO
-
 import requests
-
+from py_modules.esp8266_info import Esp8266Info
 from py_modules.build_config import BuildConfig
 
 ARDUINO_CLI_TOOL = "./tools/arduino-cli"
@@ -273,9 +272,11 @@ def _create_eep_esp8266(
                "460800", "write-flash", "0x0", app_dst_name]
 
     if has_littlefs:
+        esp8266_info = Esp8266Info()
+        spiffs_size = esp8266_info.get_spiffs_size(config.flash)
         littlefs_name = os.path.basename(littlefs_src)
         shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
-        command.extend(["0x200000", littlefs_name])
+        command.extend([f"{spiffs_size}", littlefs_name])
 
     with open(eef_path, "w", encoding="utf-8") as file:
         file.write('{\n\t"command": [')
