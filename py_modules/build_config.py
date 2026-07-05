@@ -15,13 +15,16 @@ class BuildConfig:  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self.core = os.environ.get("INPUT_CORE", "")
         self.board = os.environ.get("INPUT_BOARD")
-        self.sketch_name = os.environ.get("INPUT_SKETCH_NAME")
+        self.sketch_name = os.environ.get("INPUT_SKETCH_NAME", "")
         self.build_path = f"./BIN_{self.core}_{self.board}"
         self.cpu_f = os.environ.get("INPUT_CPU_F")
         self.libs = os.environ.get("INPUT_LIBS")
         self.flash = os.environ.get("INPUT_FLASH", "")
         self.core_version = self.__get_core_version()
-        self.__esp32_info = Esp32Info()
+        if self.core == "esp32":
+            self.__esp32_info = Esp32Info()
+        else:
+            self.__esp32_info = None
 
     def __get_core_version(self) -> str:
         core_list = CoreList()
