@@ -10,7 +10,7 @@ https://github.com/hredan/eep-build-action
 import os
 from py_modules import helper
 from py_modules import build_data
-# from py_modules.esp32_info import Esp32Info
+from py_modules.esp32_info import Esp32Info
 from py_modules.esp8266_info import Esp8266Info
 from py_modules.build_config import BuildConfig
 
@@ -49,6 +49,9 @@ if __name__ == "__main__":
         if core == "esp8266":
             esp8266_info = Esp8266Info()
             spiffs_size = esp8266_info.get_spiffs_size(build_config.flash)
-            build_data.build_data(
-                build_config.core, spiffs_size, build_config.sketch_name)
+        else:
+            esp32_info = Esp32Info()
+            spiffs_size = esp32_info.get_spiffs_size(build_config.flash)
+        build_data.build_data(
+            build_config.core, spiffs_size, build_config.sketch_name)
     helper.create_eep_dir(build_config)

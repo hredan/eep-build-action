@@ -247,7 +247,7 @@ def compile_sketch(sketch_name: str, build_path: str, fqbn: str, cpu_freq: str |
     if cpu_freq:
         command += f" --build-property cpu_freq={cpu_freq}"
     command += f" --build-path {build_path}"
-    result = run_bash_command(command, stream_output=True)
+    result = run_bash_command(command, stream_output=True, timeout=300)
     if not result["success"]:
         print(f"Error compiling sketch:\n{result['stderr']}")
         sys.exit(1)
