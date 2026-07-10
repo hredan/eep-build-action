@@ -11,6 +11,7 @@ import threading
 import shutil
 from typing import IO
 import requests
+from py_modules.esp32_info import Esp32Info
 from py_modules.esp8266_info import Esp8266Info
 from py_modules.build_config import BuildConfig
 
@@ -273,10 +274,10 @@ def _create_eep_esp8266(
 
     if has_littlefs:
         esp8266_info = Esp8266Info()
-        spiffs_size = esp8266_info.get_spiffs_size(config.flash)
+        spiffs_start = esp8266_info.get_spiffs_start(config.flash)
         littlefs_name = os.path.basename(littlefs_src)
         shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
-        command.extend([f"{spiffs_size}", littlefs_name])
+        command.extend([f"{spiffs_start}", littlefs_name])
 
     with open(eef_path, "w", encoding="utf-8") as file:
         file.write('{\n\t"command": [')
@@ -332,9 +333,11 @@ def _create_eep_esp32(
     ]
 
     if has_littlefs:
+        esp32_info = Esp32Info()
         littlefs_name = os.path.basename(littlefs_src)
         shutil.copy2(littlefs_src, os.path.join(eep_dir, littlefs_name))
-        command.extend(["0x290000", littlefs_name])
+        command.extend(
+            [f"{esp32_info.get_spiffs_start(config.flash)}", littlefs_name])
 
     with open(eef_path, "w", encoding="utf-8") as file:
         file.write('{\n\t"command": [')
