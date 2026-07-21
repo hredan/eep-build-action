@@ -19,12 +19,13 @@ class BuildConfig:  # pylint: disable=too-many-instance-attributes
         self.build_path = f"./BIN_{self.core}_{self.board}"
         self.cpu_f = os.environ.get("INPUT_CPU_F")
         self.libs = os.environ.get("INPUT_LIBS")
-        self.flash = os.environ.get("INPUT_FLASH", "")
         self.core_version = self.__get_core_version()
         if self.core == "esp32":
             self.__esp32_info = Esp32Info()
+            self.flash = os.environ.get("INPUT_FLASH", "default")
         else:
             self.__esp32_info = None
+            self.flash = os.environ.get("INPUT_FLASH", "4M2M")
 
     def __get_core_version(self) -> str:
         core_list = CoreList()
