@@ -244,6 +244,9 @@ def install_core(core: str, version: str | None = None) -> None:
 
 def compile_sketch(sketch_name: str, build_path: str, fqbn: str, cpu_freq: str | None = None) -> None:
     """Compile an Arduino sketch using arduino-cli with the given FQBN and optional CPU frequency."""
+    if not os.path.exists(ARDUINO_CLI_TOOL):
+        print(f"Error: Arduino CLI tool not found at {ARDUINO_CLI_TOOL}")
+        sys.exit(1)
     command = f"{ARDUINO_CLI_TOOL} compile --fqbn {fqbn} {sketch_name}.ino"
     if cpu_freq:
         command += f" --build-property cpu_freq={cpu_freq}"

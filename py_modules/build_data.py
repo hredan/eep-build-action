@@ -1,4 +1,9 @@
+"""
+This module contains functions to build the data partition for an Arduino sketch using the mklittlefs tool.
 
+Copyright (C) 2026 hredan
+https://github.com/hredan/eep-build-action
+"""
 import os
 import sys
 from py_modules import helper

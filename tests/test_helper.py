@@ -124,7 +124,8 @@ def test_install_libs_failure_exits() -> None:
 
 def test_compile_sketch_success() -> None:
     """Test that compile_sketch calls run_bash_command correctly."""
-    with patch.object(helper, "run_bash_command") as mock_run:
+    with patch("py_modules.helper.run_bash_command") as mock_run, \
+            patch("os.path.exists", return_value=True):
         mock_run.return_value = {"success": True}
 
         helper.compile_sketch("sketch", "./build", "esp32:esp32:esp32", "160")
@@ -139,7 +140,8 @@ def test_compile_sketch_success() -> None:
 
 def test_compile_sketch_without_cpu_freq() -> None:
     """Test that compile_sketch works without CPU frequency."""
-    with patch.object(helper, "run_bash_command") as mock_run:
+    with patch("py_modules.helper.run_bash_command") as mock_run, \
+            patch("os.path.exists", return_value=True):
         mock_run.return_value = {"success": True}
 
         helper.compile_sketch("sketch", "./build", "esp32:esp32:esp32")
@@ -159,7 +161,9 @@ def test_compile_sketch_failure_exits() -> None:
 
 def test_download_arduino_cli() -> None:
     """Test that download_arduino_cli constructs correct URL."""
-    with patch.object(helper, "download_file") as mock_download:
+
+    with patch("py_modules.helper.unpack_tar_gz"), \
+            patch("py_modules.helper.download_file") as mock_download:
         with patch("os.path.exists", return_value=False):
             helper.download_arduino_cli("1.0.0")
 
@@ -293,6 +297,7 @@ def test_download_file_http_error() -> None:
                 "http://example.com/missing.txt", "/tmp/file.txt")
             mock_print.assert_called()
 
+
 def test_download_json_files_core_esp32() -> None:
     """Test that download_json_files calls download_file for each required file."""
     os.environ["INPUT_CORE"] = "esp32"  # Set core to esp32 for this test
@@ -312,6 +317,7 @@ def test_download_json_files_core_esp32() -> None:
             assert any(
                 "esp32_mcu_bootloader_addr.json" in arg for arg in call_args_list)
 
+
 def test_download_json_files_core_esp8266() -> None:
     """Test that download_json_files calls download_file for each required file."""
     os.environ["INPUT_CORE"] = "esp8266"  # Set core to esp8266 for this test
@@ -328,6 +334,7 @@ def test_download_json_files_core_esp8266() -> None:
             assert any("esp8266.json" in arg for arg in call_args_list)
             assert any(
                 "esp8266_partition_schemes.json" in arg for arg in call_args_list)
+
 
 def test_download_json_files_skip_existing() -> None:
     """Test that download_json_files skips files that already exist."""
