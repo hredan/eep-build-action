@@ -8,6 +8,7 @@ import sys
 
 
 from py_modules.info_base import InfoBase, CORE_DATA_DIR
+from py_modules.helper_json import load_json
 
 
 class Esp8266Info(InfoBase):
@@ -15,12 +16,12 @@ class Esp8266Info(InfoBase):
 
     def __init__(self):
         try:
-            self.boards = self.load_json(f"{CORE_DATA_DIR}/esp8266.json")
+            self.boards = load_json(f"{CORE_DATA_DIR}/esp8266.json")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error initializing Esp8266Info: {e}")
             sys.exit(1)
         try:
-            partitions = self.load_json(
+            partitions = load_json(
                 f"{CORE_DATA_DIR}/esp8266_partition_schemes.json")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error initializing Esp8266Info: {e}")

@@ -9,6 +9,7 @@ https://github.com/hredan/eep-build-action
 import sys
 
 from py_modules.info_base import InfoBase, CORE_DATA_DIR
+from py_modules.helper_json import load_json
 
 
 class Esp32Info(InfoBase):
@@ -16,19 +17,19 @@ class Esp32Info(InfoBase):
 
     def __init__(self):
         try:
-            self.boards = self.load_json(f"{CORE_DATA_DIR}/esp32.json")
+            self.boards = load_json(f"{CORE_DATA_DIR}/esp32.json")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error loading ESP32 boards: {e}")
 
         try:
-            partition_schemes = self.load_json(
+            partition_schemes = load_json(
                 f"{CORE_DATA_DIR}/esp32_partition_schemes.json")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error loading ESP32 partition schemes: {e}")
             sys.exit(1)
 
         try:
-            self.bootloader_addresses = self.load_json(
+            self.bootloader_addresses = load_json(
                 f"{CORE_DATA_DIR}/esp32_mcu_bootloader_addr.json")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error loading ESP32 MCU bootloader addresses: {e}")

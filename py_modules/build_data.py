@@ -23,10 +23,10 @@ def _find_mklittlefs_tool(core: str) -> str:
                 arduino_tools_path, dir_entries[0], "mklittlefs")
             if os.path.exists(mklittlefs_path):
                 return mklittlefs_path
-            else:
-                print(
-                    f"Error: mklittlefs tool not found in {mklittlefs_path}.")
-                sys.exit(1)
+
+            print(
+                f"Error: mklittlefs tool not found in {mklittlefs_path}.")
+            sys.exit(1)
     else:
         print(
             f"Error: mklittlefs tool directory not found: {arduino_tools_path}.")

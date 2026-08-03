@@ -5,8 +5,6 @@ Copyright (C) 2026 hredan
 https://github.com/hredan/eep-build-action
 """
 import sys
-import json
-from typing import Any
 
 CORE_DATA_DIR = "esp_core_info"
 
@@ -16,15 +14,6 @@ class InfoBase:  # pylint: disable=too-few-public-methods
 
     def __init__(self, partitions: dict[str, list[dict[str, str]]]):
         self.partitions = partitions
-
-    def load_json(self, file_path: str) -> Any:
-        """Load and return parsed JSON data from the given file path."""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:  # pylint: disable=broad-exception-caught
-            print(f"Error loading JSON from {file_path}: {e}")
-            sys.exit(1)
 
     def _get_spiffs_partition(self, scheme: list[dict[str, str]]) -> dict[str, str]:
         """Return the SPIFFS partition for the given partition scheme name, or None if not found."""
