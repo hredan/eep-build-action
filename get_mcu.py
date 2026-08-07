@@ -22,7 +22,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-c", dest="core")
     parser.add_argument("-b", dest="board")
-    parser.add_argument("-s", dest="sketch_name")
     parser.add_argument("-h", "--help", action="store_true", dest="show_help")
     return parser.parse_args()
 
