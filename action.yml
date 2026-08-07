@@ -45,6 +45,7 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Run build sketch
+      id: run_build_sketch
       run: |
         pip install requests
         python $GITHUB_ACTION_PATH/build_sketch.py
