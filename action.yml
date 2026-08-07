@@ -49,6 +49,7 @@ runs:
         pip install requests
         python $GITHUB_ACTION_PATH/build_sketch.py
         MCU=$(python $GITHUB_ACTION_PATH/get_mcu.py -c ${{ inputs.core }} -b ${{ inputs.board }})
+        echo "MCU: $MCU"
         echo "mcu=$MCU" >> $GITHUB_OUTPUT
       shell: bash
       env:
