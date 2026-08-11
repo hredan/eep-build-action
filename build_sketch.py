@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     fqbn_para = ""
     if build_config.core == "esp32":
-        fqbn_para = f"esp32:esp32:{build_config.board}:FlashFreq=80,PartitionScheme={build_config.flash}" +\
+        fqbn_para = f"esp32:esp32:{build_config.board}:PartitionScheme={build_config.flash}" +\
             f",CPUFreq={build_config.cpu_f},UploadSpeed=921600"
     else:
         fqbn_para = f"esp8266:esp8266:{build_config.board}:xtal={build_config.cpu_f}" + \
