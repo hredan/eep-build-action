@@ -29,8 +29,11 @@ if __name__ == "__main__":
     helper.install_libs(build_config.libs or "")
 
     fqbn_para = ""
+
+    FQBN_EXTENSION = f",{build_config.fqbn_ext}" if build_config.fqbn_ext else ""
+
     if build_config.core == "esp32":
-        fqbn_para = f"esp32:esp32:{build_config.board}:PartitionScheme={build_config.flash}"
+        fqbn_para = f"esp32:esp32:{build_config.board}:PartitionScheme={build_config.flash}{FQBN_EXTENSION}"
     else:
         fqbn_para = f"esp8266:esp8266:{build_config.board}:xtal={build_config.cpu_f}" + \
             ",vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast" + \

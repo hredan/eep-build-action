@@ -19,6 +19,7 @@ class BuildConfig:  # pylint: disable=too-many-instance-attributes
         self.build_path = f"./BIN_{self.core}_{self.board}"
         self.cpu_f = os.environ.get("INPUT_CPU_F")
         self.libs = os.environ.get("INPUT_LIBS")
+        self.fqbn_ext = os.environ.get("INPUT_FQBN_EXT", "")
         self.core_version = self.__get_core_version()
         self.__esp32_info: Esp32Info | None
         if self.core == "esp32":

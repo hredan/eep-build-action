@@ -32,6 +32,10 @@ inputs:
     description: 'CPU frequency: e.g. 80, 160 or 240'
     required: false
     default: '160'
+  fqbn-ext: # FQBN extension
+    description: 'FQBN extension for the board'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
@@ -61,6 +65,7 @@ runs:
         INPUT_CORE_VERSION: ${{ inputs.core-version }}
         INPUT_LIBS: ${{ inputs.libs }}
         INPUT_CPU_F: ${{ inputs.cpu-frequency }}
+        INPUT_FQBN_EXT: ${{ inputs.fqbn-ext }}
     - name: Create build info
       shell: bash
       # GITHUB_REF_NAME: in case of a tag, this will be the tag name, otherwise it will be the branch name
