@@ -1,5 +1,8 @@
 name: 'esp-build-action'
 description: 'Builds an eep file, this can be used with the ESPEASYFLASHER_2.0'
+branding:
+  icon: 'award'
+  color: 'orange'
 inputs:
   sketch-name: # name of main ino file
     description: 'Name of the main ino file'
