@@ -32,16 +32,30 @@ inputs:
     description: 'CPU frequency: e.g. 80, 160 or 240'
     required: false
     default: '160'
+  fqbn-ext: # FQBN extension
+    description: 'FQBN extension for the board'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.x'
     - name: Set GitHub Path
       run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
       shell: bash
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
-    - name: Run build_sketch.sh
-      run: start_action.sh
+    - name: Run build sketch
+      id: run_build_sketch
+      run: |
+        pip install requests
+        python $GITHUB_ACTION_PATH/build_sketch.py
+        MCU=$(python $GITHUB_ACTION_PATH/get_mcu.py -c ${{ inputs.core }} -b ${{ inputs.board }})
+        echo "MCU: $MCU"
+        echo "mcu=$MCU" >> $GITHUB_OUTPUT
       shell: bash
       env:
         INPUT_SKETCH_NAME: ${{ inputs.sketch-name }}
@@ -51,6 +65,7 @@ runs:
         INPUT_CORE_VERSION: ${{ inputs.core-version }}
         INPUT_LIBS: ${{ inputs.libs }}
         INPUT_CPU_F: ${{ inputs.cpu-frequency }}
+        INPUT_FQBN_EXT: ${{ inputs.fqbn-ext }}
     - name: Create build info
       shell: bash
       # GITHUB_REF_NAME: in case of a tag, this will be the tag name, otherwise it will be the branch name
@@ -72,6 +87,6 @@ runs:
     #     create_eep_package.sh -s $EEP_NAME -c ${{ inputs.core }} -b ${{ inputs.board }}
     - uses: actions/upload-artifact@v7
       with:
-        name: ${{inputs.core}}_${{inputs.board}}_${{steps.set_eep_name.outputs.eep_name}}
+        name: ${{steps.run_build_sketch.outputs.mcu}}_${{inputs.board}}_${{steps.set_eep_name.outputs.eep_name}}
         path: ${{ inputs.sketch-path }}/EEP/*
     
